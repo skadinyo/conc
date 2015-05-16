@@ -26,9 +26,9 @@
         par (int (Math/sqrt lim))]
     (do
       (doseq [i (range 2 lim)
-              :while (< i par)
+              :while (<= i par)
               :when (aget res i)]
-        (doseq [j (range (* i i) lim i)]
+        (doseq [j (range (+ i i) lim i)]
           (aset res j false)))
       (filter #(aget res %)
               (range 2 lim)))))

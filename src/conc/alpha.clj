@@ -29,7 +29,7 @@
 ;;problem 2
 
 (defn lazy-fib
-  ([] (lazy-fib 1 2))
+  ([] (lazy-fib 1 1))
   ([a b] (cons a (lazy-seq (lazy-fib b (+' a b))))))
 
 (defn eul-2-1
@@ -89,8 +89,35 @@
 
 ;;still not done
 
+;;problem 5
 
+(defn count-div
+  [a b]
+  (loop [temp b res 0]
+    (if (not (= 0 (rem temp a)))
+      res
+      (recur (quot temp a) (inc res)))))
 
+(defn eul-5-1
+  [lim]
+  (let [ns (range 1 (inc lim))]
+    (->> (for [i (m/primes-to (inc lim))]
+           [i (->> ns
+                   (filter #(= 0 (rem % i)))
+                   (map #(count-div i %))
+                   (apply max))])
+         (map #(let [[a b] %]
+                (reduce * (repeat b a))))
+         (reduce *'))))
 
+;;average 0.2 ms
 
+;;problem 5
 
+(defn eul-5-1
+  [lim]
+  (let [sum (*' lim (/ (inc lim) 2))]
+    (- (* sum sum)
+        (* (+ (* 2 lim) 1)
+            (inc lim)
+            (/ lim 6)))))
