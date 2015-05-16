@@ -1,9 +1,10 @@
 (ns conc.alpha
-  (require [clojure.core.reducers :as r]))
+  (require [clojure.core.reducers :as r]
+           [conc.core :as m]))
 
 ;;problem 1 (lim 10.000.000)
 
-(defn eul1-1
+(defn eul-1-1
   [lim]
   (reduce +'
           (filter #(or (= 0 (rem % 3))
@@ -12,7 +13,7 @@
 
 ;;average 550 ms
 
-(defn eul1-2
+(defn eul-1-2
   "using atom"
   [lim]
   (let [res (atom 0)]
@@ -31,7 +32,7 @@
   ([] (lazy-fib 1 2))
   ([a b] (cons a (lazy-seq (lazy-fib b (+' a b))))))
 
-(defn eul2-1
+(defn eul-2-1
   [lim]
   (->> (lazy-fib)
        (take-while #(< % lim))
@@ -39,4 +40,15 @@
        (reduce +')))
 
 ;;problem 3
+
+(defn eul-3-1
+  [x]
+  (let [lim (int (Math/sqrt x))]
+    (last (filter #(= 0 (rem x %)) (m/primes-to lim)))))
+
+;;average 60 ms
+
+;;problem 4
+
+
 
