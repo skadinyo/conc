@@ -161,3 +161,24 @@
          (apply max))))
 
 ;;average 11-20 ms
+
+;;problem 9
+
+(defn eul-9-1
+  [n]
+  (for [b (range 4 n)
+        c (range 3 n)
+        :let [a (- n b c)]
+        :when (and (> a b c)
+                   (= (* a a)
+                      (+ (* b b)
+                         (* c c))))]
+    (* a b c)))
+
+;;problem 10
+
+(defn eul-10-1
+  [lim]
+  (reduce +' (m/primes-to lim)))
+
+;;avg 100 ms
