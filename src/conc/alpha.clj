@@ -50,5 +50,47 @@
 
 ;;problem 4
 
+;;naive implementation
+
+(defn palin?
+  [x]
+  (let [st (str x)]
+    (= st (apply str (reverse st)))))
+
+(defn eul-4-1
+  [digit]
+  (let [lower-lim (reduce *' (repeat (dec digit) 10))
+        upper-lim (reduce *' (repeat digit 10))]
+    (->> (for [i (range lower-lim upper-lim)
+               j (range lower-lim upper-lim)
+               :when (> j i)
+               :when (or (= 0 (rem i 11))
+                         (= 0 (rem j 11)))
+               :let [x (* i j)]
+               :when (palin? x)]
+           x)
+         (apply max))))
+
+[913 993]
+
+;;average 85 ms
+
+(defn eul-4-2
+  [digit]
+  (let [lim (dec (reduce *' (repeat digit 10)))]
+    (loop [a lim b lim]
+      (let [x (*' a b)]
+        (if (palin? x)
+          (print a b x)
+          (if (and (= 6 (count (seq (str x))))
+                   (> (* a b) (* a (dec a))))
+            (recur a (dec b))
+            (recur (dec a) lim)))))))
+
+;;still not done
+
+
+
+
 
 
