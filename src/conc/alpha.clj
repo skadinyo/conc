@@ -112,12 +112,29 @@
 
 ;;average 0.2 ms
 
-;;problem 5
+;;problem 6
 
-(defn eul-5-1
+(defn eul-6-1
   [lim]
   (let [sum (*' lim (/ (inc lim) 2))]
     (- (* sum sum)
         (* (+ (* 2 lim) 1)
             (inc lim)
             (/ lim 6)))))
+
+
+;;problem 7
+
+;;next-prime
+
+(defn eul-7-1
+  [n]
+  (cond
+    (= 1 n) 2
+    :else (loop [i 3 res 2]
+            (if (= n res)
+              i
+              (let [next-i (+' i 2)]
+                (if (m/prime? next-i)
+                  (recur next-i (inc res))
+                  (recur next-i res)))))))

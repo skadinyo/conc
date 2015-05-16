@@ -18,7 +18,7 @@
           true
           (if (= 0 (rem x i))
             false
-            (recur (+ i 2))))))))
+            (recur (+' i 2))))))))
 
 (defn primes-to
   [lim]
