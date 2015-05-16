@@ -138,3 +138,26 @@
                 (if (m/prime? next-i)
                   (recur next-i (inc res))
                   (recur next-i res)))))))
+
+;;problem 8
+
+(defn eul-8
+  []
+  (->> (slurp "resources/problem-8.txt")
+       clojure.string/split-lines
+       (map seq)
+       flatten
+       (mapv #(Integer/parseInt (str %)))))
+
+(defn eul-8-1
+  [n]
+  (let [refs (eul-8)]
+    (->> (for [i (range 0 (- (count refs) n))]
+           (->> refs
+                (drop i)
+                (take n)))
+         (filter #(nil? (some #{0} %)))
+         (map #(reduce *' %))
+         (apply max))))
+
+;;average 11-20 ms
