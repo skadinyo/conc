@@ -32,3 +32,35 @@
           (aset res j false)))
       (filter #(aget res %)
               (range 2 lim)))))
+
+(defn n-permutes
+  [n coll]
+  (let [init (partition 1 coll)
+        join-coll (fn [coll join]
+                    (let [init-set (set (partition 1 coll))
+                          join-set (set join)
+                          diff (vec (clojure.set/difference join-set init-set))]
+                      (map (fn [i]
+                             (concat coll
+                                     i))
+                           diff)))]
+    (cond
+      (= 1 n) init
+      (> n (count coll)) []
+      :else (loop [c 1 res init]
+              (if (= c n)
+                res
+                (recur (inc c)
+                       (->> res
+                            (map #(join-coll % init))
+                            (flatten)
+                            (partition (inc c)))))))))
+
+(defn coll-integer
+  [coll]
+  (let [c (count coll)
+        rcoll (vec (reverse coll))]
+    (reduce +
+            (map #(*' (reduce *' (repeat % 10))
+                      (get rcoll %))
+                 (range 0 c)))))

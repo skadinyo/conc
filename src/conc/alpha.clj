@@ -312,3 +312,185 @@
        (apply str)))
 
 ;;average 3 ms
+
+;;problem 14
+
+(defn collatz-seq
+  [n]
+  (loop [i n c 1]
+    (if (>= 1 i)
+      c
+      (if (even? i)
+        (recur (/ i 2) (inc c))
+        (recur (+ (* 3 i) 1) (inc c))))))
+
+(defn eul-14-1
+  [lim]
+  (->> (range 2 lim)
+       (map (fn [a]
+              [a (collatz-seq a)]))
+       (sort-by last)
+       (last)))
+
+;;average 8800 ms
+
+;;;;problem 16
+
+(defn eul-16-1
+  [a n]
+  (->> (repeat n a)
+       (reduce *')
+       (str)
+       (seq)
+       (map #(Integer/parseInt (str %)))
+       (reduce +)))
+;;average 2.5 ms
+
+;;problem 17
+
+(defn one-nineteen
+  [n]
+  ((zipmap (range 0 20)
+           ["zero"
+            "one"
+            "two"
+            "three"
+            "four"
+            "five"
+            "six"
+            "seven"
+            "eight"
+            "nine"
+            "ten"
+            "eleven"
+            "twelve"
+            "thirteen"
+            "fourteen"
+            "fifteen"
+            "sixteen"
+            "seventeen"
+            "eighteen"
+            "nineteen"]) n))
+
+(defn twenty-ninety
+  [n]
+  ((zipmap (map #(* 10 %)
+                (range 2 10))
+           ["twenty"
+            "thirty"
+            "forty"
+            "fifty"
+            "sixty"
+            "seventy"
+            "eighty"
+            "ninety"]) n))
+
+
+(defn hundred
+  [n]
+  (str (one-nineteen (quot n 100)) "hundred"))
+
+(defn number-string
+  "1 -> one"
+  [n]
+  (cond
+    (= 1000 n) "onethousand"
+    (= 0 (rem n 100)) (hundred n)
+    (<= n 19) (one-nineteen n)
+    (and (< n 99)
+         (= 0 (rem n 10))) (twenty-ninety n)
+    (>= (quot n 100) 1) (str (hundred (* 100 (quot n 100))) "and" (number-string (rem n 100)))
+    (>= (quot n 10) 2) (str (twenty-ninety (* 10 (quot n 10))) (number-string (rem n 10)))
+    :else nil))
+
+;;problem 32
+
+(defn count-dig
+  [n]
+  (cond
+    (<= n 9) 1
+    (<= n 99) 2
+    (<= n 999) 3
+    (<= n 9999) 4
+    (<= n 99999) 5
+    (<= n 999999) 6
+    (<= n 9999999) 7
+    (<= n 99999999) 8
+    (<= n 999999999) 9
+    (<= n 9999999999) 10
+    :else 11))
+
+(defn eul-32-1
+  []
+  (->> (for [i (range 1 2000)
+             j (range 1 50)
+             :let [ij (* i j)]
+             :when (= 9 (apply + (map count-dig [i j ij])))
+             :let [ij-set (->> [i j ij]
+                               (map str)
+                               (map seq)
+                               (flatten)
+                               (remove #(= \0 %))
+                               set)]
+             :when (= 9 (count ij-set))]
+         ij)
+       set
+       (reduce +)))
+
+;;average 600 ms
+
+;;problem 38
+
+(defn eul-38-1
+  []
+  (->> (for [n (range 1 9999)
+             :let [n2 (* 2 n)]
+             :when (= 9 (+ (count-dig n) (count-dig n2)))
+             :let [n-set (->> [n n2]
+                              (map str)
+                              (map seq)
+                              (flatten)
+                              set
+                              (remove #(= \0 %))
+                              set)]
+             :when (= 9 (count n-set))]
+         (Integer/parseInt (str n n2)))
+       (sort)
+       (last)))
+
+;; average 167 ms
+
+;;problem 43
+
+(defn eul-43-cond
+  [coll]
+  (let [d1 (not (= 0 (nth coll 0)))
+        d2d3d4 (let [d (take 3 (drop 1 coll))]
+                 (= 0 (rem (->> d
+                                m/coll-integer)
+                           2)))
+        d3d4d5 (let [d (take 3 (drop 2 coll))]
+                 (= 0 (rem (->> d
+                                m/coll-integer)
+                           3)))]
+    (and d1 d2d3d4 d3d4d5)))
+
+(defn eul-43-1
+  []
+  (let [ncoll-1 [1 4 6 0]
+        ncoll-2 [1 3 4 0]
+        coll-1 [3 5 7 2 8 9]
+        coll-2 [9 5 2 8 6 7]
+        calculate (fn [ncoll coll]
+                    (let [permute-ncoll (m/n-permutes 4 ncoll)]
+                      (->> permute-ncoll
+                           (map #(concat % coll))
+                           (filter eul-43-cond)
+                           (map m/coll-integer)
+                           (reduce +))))]
+    (+ (calculate ncoll-1 coll-1)
+       (calculate ncoll-2 coll-2))))
+
+
+;;average 8 ms
+
