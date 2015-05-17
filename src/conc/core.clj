@@ -20,6 +20,7 @@
             false
             (recur (+' i 2))))))))
 
+
 (defn primes-to
   [lim]
   (let [res (boolean-array (inc lim) true)
@@ -64,3 +65,17 @@
             (map #(*' (reduce *' (repeat % 10))
                       (get rcoll %))
                  (range 0 c)))))
+
+(defn number-collumn
+  [n]
+  (->> n
+       (str)
+       (seq)
+       (map str)
+       (map #(Integer/parseInt %))))
+
+(defn permutes?
+  [coll]
+  (apply = (map sort
+                (map number-collumn
+                     coll))))

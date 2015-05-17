@@ -491,6 +491,25 @@
     (+ (calculate ncoll-1 coll-1)
        (calculate ncoll-2 coll-2))))
 
-
 ;;average 8 ms
 
+
+;;problem 49
+
+(defn eul-49-1
+  []
+  (let [primes (filter #(> % 1000)
+                       (m/primes-to 10000))]
+    (for [i primes
+          j primes
+          :when (> i j)
+          :let [diff (- i j)
+                j2 (+ j diff)]
+          :when (and (m/prime? j2)
+                     (m/permutes? [j j2]))
+          :let [j3 (+ j2 diff)]
+          :when (and (m/prime? j3)
+                      (m/permutes? [j j2 j3]))]
+      (str j j2 j3))))
+
+;;average 3426 ms
