@@ -294,3 +294,21 @@
 
 ;;problem 13
 
+(defn eul-13-1
+  []
+  (->> (slurp "./resources/problem-13.txt")
+       (clojure.string/split-lines)
+       (map (fn [st]
+              (apply str (concat []
+                                 [(first st)]
+                                 ["."]
+                                 (drop 1 st)))))
+       (map #(Double/parseDouble %))
+       (reduce +)
+       (str)
+       (seq)
+       (take 11)
+       (filter #(not (#{\.} %)))
+       (apply str)))
+
+;;average 3 ms
