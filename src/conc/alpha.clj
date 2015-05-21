@@ -501,7 +501,7 @@
           j primes
           :when (> i j)
           :let [diff (- i j)
-                j2 (+ j diff)]
+                j2   (+ j diff)]
           :when (and (m/prime? j2)
                   (m/permutes? [j j2]))
           :let [j3 (+ j2 diff)]
@@ -516,7 +516,7 @@
 
 (defn path-find
   ([root set-path used]
-    (path-find root (clojure.set/difference set-path used)))
+   (path-find root (clojure.set/difference set-path used)))
   ([root set-path]
    (let [[x y] root
          maybe-path (set (map (fn [a]
@@ -534,7 +534,7 @@
   (not (nil? (reduce (fn [a b]
                        (if (nil? a)
                          nil
-                          (let [maybe-path (set (map (fn [x]
+                         (let [maybe-path (set (map (fn [x]
                                                       (mapv #(- %1 %2)
                                                         a
                                                         x))
@@ -542,7 +542,7 @@
                                                   [1 0]
                                                   [0 -1]
                                                   [0 1]]))
-                               next (some maybe-path [b])]
+                               next       (some maybe-path [b])]
                            (if next
                              next
                              nil)))) coll))))
@@ -583,4 +583,57 @@
             )
           )))))
 
+;; problem 54
 
+(defn eul-54
+  []
+  (->> (slurp "test.txt")
+    (clojure.string/split-lines)
+    (map (fn [coll]
+           (->> (clojure.string/split coll #" ")
+             (partition 5))))))
+
+(defn card-value
+  [card-coll]
+  (let [card-val (->> card-coll
+                   (map first)
+                   (map str))
+        card-sym (->> card-coll
+                   (map last)
+                   (map str)
+                   (set))
+        val-refs (zipmap (map str (conj (vec (range 2 10)) "T" "J" "Q" "K" "A"))
+                   (range 2 15))
+        card-number (map (fn [st]
+                           (val-refs st))
+                      card-val)]
+    [card-number card-sym]))
+
+(defn straight?
+  [num-coll]
+  (if (= num-coll [2 3 4 5 14])
+    true
+    (reduce (fn [a b]
+              (if a
+                (if (= (inc a) b)
+                  b
+                  nil)
+                nil))
+      num-coll)))
+
+(defn find-card-rank
+  [[numbers syms]]
+  (let [sort-num (sort numbers)
+        highest-card (reverse sort-num)
+        c-sym (count syms)
+        straight? (fn [num-coll]
+                    (if (= num-coll [2 3 4 5 14])
+                      true
+                      (reduce (fn [a b]
+                                (if a
+                                  (if (= (inc a) b)
+                                    b
+                                    nil)
+                                  nil))
+                        num-coll)))]
+    ))
