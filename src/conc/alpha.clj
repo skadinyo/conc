@@ -765,3 +765,62 @@
 
 ;; lama banget 2 game dota
 
+;;problem 89
+
+(defn roman
+  []
+  (->> (slurp "roman.txt")
+    (clojure.string/split-lines)))
+
+(defn rr
+  [st]
+  (letfn [(roman? [ch] (cond
+                         (= \I ch) 1
+                         (= \V ch) 5
+                         (= \X ch) 10
+                         (= \L ch) 50
+                         (= \C ch) 100
+                         (= \D ch) 500
+                         (= \M ch) 1000
+                         :else 0))]
+    (loop [coll (map roman? st) res 0]
+      (if (empty? coll)
+        res
+        (if (nil? (second coll))
+          (+ res (first coll))
+          (if (< (first coll) (second coll))
+            (recur (drop 2 coll) (+ res (- (second coll) (first coll))))
+            (recur (rest coll) (+ res (first coll)))))))))
+
+(defn num-roman [i] (loop [x i res []]
+                    (cond
+                      (>= x 1000) (recur (- x 1000) (conj res "M"))
+                      (>= x 900) (recur (- x 900) (conj res "CM"))
+                      (>= x 500) (recur (- x 500) (conj res "D"))
+                      (>= x 400) (recur (- x 400) (conj res "CD"))
+                      (>= x 100) (recur (- x 100) (conj res "C"))
+                      (>= x 90) (recur (- x 90) (conj res "XC"))
+                      (>= x 50) (recur (- x 50) (conj res "L"))
+                      (>= x 40) (recur (- x 40) (conj res "XL"))
+                      (>= x 10) (recur (- x 10) (conj res "X"))
+                      (>= x 9) (recur (- x 9) (conj res "IX"))
+                      (>= x 5) (recur (- x 5) (conj res "V"))
+                      (>= x 4) (recur (- x 4) (conj res "IV"))
+                      (>= x 1) (recur (- x 1) (conj res "I"))
+                      :else (apply str res))))
+
+(defn eul-89-1
+  []
+  (time (->> (roman)
+          (map (fn [st]
+                 [(rr st) st]))
+          (map (fn [[n temp]]
+                 [(num-roman n) temp]))
+          (map (fn [[a b]]
+                 (- (count b) (count a))))
+          (reduce +))))
+
+;; average 25 ms
+
+
+
