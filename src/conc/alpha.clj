@@ -514,6 +514,8 @@
 
 ;;average 3426 ms
 
+
+;;defn problem 83
 (defn path-find
   ([root set-path used]
    (path-find root (clojure.set/difference set-path used)))
@@ -583,36 +585,50 @@
             )
           )))))
 
+;;not done
+
 ;; problem 54
 
 (defn eul-54
   []
   (->> (slurp "test.txt")
     (clojure.string/split-lines)
-    (map (fn [coll]
-           (->> (clojure.string/split coll #" ")
-             (partition 5))))))
+    (mapv (fn [coll]
+            (->> (clojure.string/split coll #" ")
+              (partition 5)
+              (mapv vec))))))
 
-(defn card-value
-  [card-coll]
-  (let [card-val (->> card-coll
-                   (map first)
-                   (map str))
-        card-sym (->> card-coll
-                   (map last)
-                   (map str)
-                   (set))
-        val-refs (zipmap (map str (conj (vec (range 2 10)) "T" "J" "Q" "K" "A"))
-                   (range 2 15))
-        card-number (map (fn [st]
-                           (val-refs st))
-                      card-val)]
-    [card-number card-sym]))
+(defn one-pair?
+  [numbers]
+  (let [temp (->> numbers
+               (partition-by identity)
+               (filter #(= 2 (count %))))]
+    (if (= 1 (count temp))
+      (ffirst temp)
+      false)))
+
+(defn two-pair?
+  [numbers]
+  (let [temp (->> numbers
+               (partition-by identity)
+               (filter #(= 2 (count %))))]
+    (if (= 2 (count temp))
+      (ffirst (take-last 1 temp))
+      false)))
+
+(defn three-of-a-kind?
+  [numbers]
+  (let [temp (->> numbers
+               (partition-by identity)
+               (filter #(= 3 (count %))))]
+    (if (= 1 (count temp))
+      (ffirst temp)
+      false)))
 
 (defn straight?
   [num-coll]
   (if (= num-coll [2 3 4 5 14])
-    true
+    14
     (reduce (fn [a b]
               (if a
                 (if (= (inc a) b)
@@ -621,19 +637,101 @@
                 nil))
       num-coll)))
 
-(defn find-card-rank
-  [[numbers syms]]
-  (let [sort-num (sort numbers)
-        highest-card (reverse sort-num)
-        c-sym (count syms)
-        straight? (fn [num-coll]
-                    (if (= num-coll [2 3 4 5 14])
-                      true
-                      (reduce (fn [a b]
-                                (if a
-                                  (if (= (inc a) b)
-                                    b
-                                    nil)
-                                  nil))
-                        num-coll)))]
-    ))
+(defn flush?
+  [syms]
+  (= 1 (count syms)))
+
+(defn full-house?
+  [numbers]
+  (let [temp (frequencies numbers)]
+    (if (= #{2 3} (set (vals temp)))
+      (first (filter #(= 3 (temp %)) (keys temp)))
+      false)))
+
+(defn four-of-a-kind?
+  [numbers]
+  (let [temp (first (->> numbers
+                      (partition-by identity)
+                      (sort-by count)
+                      (take-last 1)))]
+    (if (= 4 (count temp))
+      (first temp)
+      false)))
+
+(defn straight-flush?
+  [numbers syms]
+  (if (and (straight? numbers)
+        (= 1 (count syms)))
+    (last numbers)))
+
+(defn royal-straight-flush?
+  [numbers syms]
+  (and (= numbers [10 11 12 13 14])
+    (= 1 (count syms))))
+
+(defn cards-rank
+  "[rank rank-properties numbers]"
+  [card-coll]
+  (let [card-sym    (->> card-coll
+                      (map last)
+                      (map str)
+                      (set))
+        val-refs    (zipmap (map str (conj (vec (range 2 10)) "T" "J" "Q" "K" "A"))
+                      (range 2 15))
+        card-number (sort (map (fn [st]
+                                 (val-refs st))
+                            (->> card-coll
+                              (map first)
+                              (map str))))
+        temp        [(vec (reverse card-number))]]
+    (let [royal-straight-flush (royal-straight-flush? card-number card-sym)
+          straight-flush       (straight-flush? card-number card-sym)
+          four-of-a-kind       (four-of-a-kind? card-number)
+          full-house           (full-house? card-number)
+          flush                (flush? card-sym)
+          straight             (straight? card-number)
+          three-of-a-kind      (three-of-a-kind? card-number)
+          two-pair             (two-pair? card-number)
+          one-pair             (one-pair? card-number)]
+      (vec (cond
+             royal-straight-flush (concat [10 0] temp)
+             straight-flush (concat [9 straight-flush] temp)
+             four-of-a-kind (concat [8 four-of-a-kind temp])
+             full-house (concat [7 full-house] temp)
+             flush (concat [6 0] temp)
+             straight (concat [5 straight] temp)
+             three-of-a-kind (concat [4 three-of-a-kind] temp)
+             two-pair (concat [3 two-pair] temp)
+             one-pair (concat [2 one-pair] temp)
+             :else (concat [1 0] temp))))))
+
+(defn highest-card
+  [[h1 & h1s] [h2 & h2s]]
+  (if (and (nil? h1)
+        (nil? h2))
+    "p1"
+    (cond
+      (> h1 h2) "p1"
+      (> h2 h1) "p2"
+      :else (highest-card h1s h2s))))
+
+(defn eul-54-1
+  []
+  (let [cards (eul-54)
+        ranks (mapv (fn [coll]
+                      (mapv cards-rank coll))
+                cards)
+        winner (fn [[[f1 p1 h1] [f2 p2 h2]]]
+                 (cond
+                   (> f1 f2) "p1"
+                   (> f2 f1) "p2"
+                   (= f1 f2) (cond
+                               (> p1 p2) "p1"
+                               (> p2 p1) "p2"
+                               :else (highest-card h1 h2))
+                   :else (highest-card h1 h2)))]
+    (->> ranks
+      (map winner)
+      frequencies)))
+
+;;average 88 ms
