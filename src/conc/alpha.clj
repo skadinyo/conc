@@ -717,10 +717,10 @@
 
 (defn eul-54-1
   []
-  (let [cards (eul-54)
-        ranks (mapv (fn [coll]
-                      (mapv cards-rank coll))
-                cards)
+  (let [cards  (eul-54)
+        ranks  (mapv (fn [coll]
+                       (mapv cards-rank coll))
+                 cards)
         winner (fn [[[f1 p1 h1] [f2 p2 h2]]]
                  (cond
                    (> f1 f2) "p1"
@@ -735,3 +735,33 @@
       frequencies)))
 
 ;;average 88 ms
+
+;;problem 104
+
+
+(defn pan-fib?
+  [n]
+  (if (< n 1000000000000000000)
+    false
+    (let [coll (->> n
+                 (str)
+                 (map str))
+          head (set (map #(Integer/parseInt %) (take 9 coll)))
+          tail (set (map #(Integer/parseInt %) (take-last 9 coll)))]
+      (if (or (some #{0} head)
+            (some #{0} tail))
+        false
+        (= 9 (count head) (count tail))))))
+
+(defn eul-104
+  []
+  (loop [[a b] [1 1] c 1]
+    (if (pan-fib? a)
+      c
+      (do
+        (println c)
+        (recur [b (+' a b)]
+          (inc c))))))
+
+;; lama banget 2 game dota
+

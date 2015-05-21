@@ -5,11 +5,11 @@
   [x]
   (cond
     (or (= 2 x)
-        (= 3 x))
+      (= 3 x))
     true
     (or (> 2 x)
-        (= 0 (rem x 2))
-        (= 0 (rem x 3)))
+      (= 0 (rem x 2))
+      (= 0 (rem x 3)))
     false
     :else
     (let [lim (int (Math/sqrt x))]
@@ -32,19 +32,19 @@
         (doseq [j (range (+ i i) lim i)]
           (aset res j false)))
       (filter #(aget res %)
-              (range 2 lim)))))
+        (range 2 lim)))))
 
 (defn n-permutes
   [n coll]
-  (let [init (partition 1 coll)
+  (let [init      (partition 1 coll)
         join-coll (fn [coll join]
                     (let [init-set (set (partition 1 coll))
                           join-set (set join)
-                          diff (vec (clojure.set/difference join-set init-set))]
+                          diff     (vec (clojure.set/difference join-set init-set))]
                       (map (fn [i]
                              (concat coll
-                                     i))
-                           diff)))]
+                               i))
+                        diff)))]
     (cond
       (= 1 n) init
       (> n (count coll)) []
@@ -52,31 +52,43 @@
               (if (= c n)
                 res
                 (recur (inc c)
-                       (->> res
-                            (map #(join-coll % init))
-                            (flatten)
-                            (partition (inc c)))))))))
+                  (->> res
+                    (map #(join-coll % init))
+                    (flatten)
+                    (partition (inc c)))))))))
 
 (defn coll-integer
   [coll]
-  (let [c (count coll)
+  (let [c     (count coll)
         rcoll (vec (reverse coll))]
     (reduce +
-            (map #(*' (reduce *' (repeat % 10))
-                      (get rcoll %))
-              (range 0 c)))))
+      (map #(*' (reduce *' (repeat % 10))
+             (get rcoll %))
+        (range 0 c)))))
 
 (defn number-collumn
   [n]
   (->> n
-       (str)
-       (seq)
-       (map str)
-       (map #(Integer/parseInt %))))
+    (str)
+    (seq)
+    (map str)
+    (map #(Integer/parseInt %))))
+
+(defn number-coll
+  [n]
+  (let [refs 10]
+    (loop [temp n res []]
+      (let [r (rem temp refs)
+            q (quot temp refs)]
+        (if (= 0 q)
+          (cons temp res)
+          (recur (/ (- temp r) 10)
+            (cons r res)))))))
+
 
 (defn permutes?
   [coll]
   (apply = (map sort
-                (map number-collumn
-                     coll))))
+             (map number-collumn
+               coll))))
 
