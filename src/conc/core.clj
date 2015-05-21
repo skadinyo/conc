@@ -64,7 +64,7 @@
     (reduce +
             (map #(*' (reduce *' (repeat % 10))
                       (get rcoll %))
-                 (range 0 c)))))
+              (range 0 c)))))
 
 (defn number-collumn
   [n]
@@ -79,3 +79,4 @@
   (apply = (map sort
                 (map number-collumn
                      coll))))
+
