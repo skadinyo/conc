@@ -92,3 +92,7 @@
              (map number-collumn
                coll))))
 
+(defn pow
+  "a^b"
+  [a b]
+  (reduce *' (repeat b a)))

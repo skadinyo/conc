@@ -822,5 +822,47 @@
 
 ;; average 25 ms
 
+;;problem 62
 
+(defn eul-62-1
+  [lim]
+  (time (->> (map #(*' % % %) (range 1000 10000))
+          (map (fn [x]
+                 [x (vec (sort (m/number-collumn x)))]))
+          (group-by second)
+          (mapv (fn [[k v]]
+                  [(mapv first v)
+                   (count v)]))
+          (filter (fn [[k v]]
+                    (= v 5)))
+          (map (fn [[k v]]
+                 k))
+          (flatten)
+          (sort)
+          (first))))
+
+;;average 118 ms
+
+
+;;problem 60
+
+(defn join-number
+  [[a b]]
+  (Integer/parseInt (str a b)))
+
+(defn eul-60
+  []
+  (let [p (drop 1 (m/primes-to 1000))
+        primes (concat (take 1 p)
+                 (drop 2 p))]
+    (for [i primes
+          j primes
+          k primes
+          :when (and (not (= i j k))
+                  (let [list-perm (m/n-permutes 2 [i j k])]
+                    (every? m/prime?
+                      (map join-number list-perm))))]
+      [i j k])))
+
+;;not done
 
