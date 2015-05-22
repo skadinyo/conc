@@ -2,6 +2,57 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 18
+
+(def eul-18
+  (->> (slurp "./resources/problem-18.txt")
+    ((fn [coll]
+       (clojure.string/split coll #"] ")))
+    (map #(re-seq #"\d+" %))
+    (mapv (fn [coll]
+            (mapv #(Integer/parseInt %) coll)))))
+
+(def get-path
+  (memoize (fn get-path [i j]
+             (if (= 14 i)
+               (get-in eul-18 [i j])
+               (let [root  (get-in eul-18 [i j])
+                     left  (get-path (inc i) j)
+                     right (get-path (inc i) (inc j))]
+                 (if (> left right)
+                   (+ root left)
+                   (+ root right)))))))
+
+(defn eul-18-1
+  []
+  (get-path 0 0))
+
+;;average 53 ms
+
+;;problem 67
+
+(def eul-67
+  (->> (slurp "./resources/problem-67.txt")
+    (clojure.string/split-lines)
+    (mapv (fn [coll]
+            (mapv (fn [a]
+                    (Integer/parseInt a))
+              (clojure.string/split coll #" "))))))
+
+(def get-path-2
+  (memoize (fn [i j]
+             (if (= i 99)
+               (get-in eul-67 [i j])
+               (+ (get-in eul-67 [i j])
+                 (max (get-path-2 (inc i) j)
+                   (get-path-2 (inc i) (inc j))))))))
+
+(defn eul-67-1
+  []
+  (get-path-2 0 0))
+
+;;average 28 ms !!!!!
+
 ;;problem 12
 
 (defn gen-tri
@@ -20,7 +71,7 @@
                          (aset temp i
                            (assoc
                              (aget temp i)
-                             p (count-div p i)))))]
+                             p (m/count-div p i)))))]
     (do
       (doseq [p primes]
         (update-array p))
@@ -46,21 +97,18 @@
       (->> p
         (filter #(zero? (rem n %)))
         (map (fn [i]
-               {i (count-div i n)}))
+               {i (m/count-div i n)}))
         (reduce #(merge %1 %2))))))
 
 (defn eul-12-2
   [n]
   (loop [i 3 tri 3]
-    (do
-      (println i " " tri " " (prime-fac tri))
-      (if (>= (let [v (vals (prime-fac tri))]
-                (apply + (conj v (count v))))
-            n)
-        tri
-        (recur (inc i)
-          (reduce + (range i 0 -1)))
-        ))))
+    (if (>= (let [v (vals (prime-fac tri))]
+              (apply + (conj v (count v))))
+          n)
+      tri
+      (recur (inc i)
+        (reduce + (range i 0 -1))))))
 
 ;;too slow
 

@@ -91,20 +91,13 @@
 
 ;;problem 5
 
-(defn count-div
-  [a b]
-  (loop [temp b res 0]
-    (if (not (= 0 (rem temp a)))
-      res
-      (recur (quot temp a) (inc res)))))
-
 (defn eul-5-1
   [lim]
   (let [ns (range 1 (inc lim))]
     (->> (for [i (m/primes-to (inc lim))]
            [i (->> ns
                 (filter #(= 0 (rem % i)))
-                (map #(count-div i %))
+                (map #(m/count-div i %))
                 (apply max))])
       (map #(let [[a b] %]
              (reduce * (repeat b a))))

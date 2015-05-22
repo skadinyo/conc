@@ -96,3 +96,10 @@
   "a^b"
   [a b]
   (reduce *' (repeat b a)))
+
+(defn count-div
+  [a b]
+  (loop [temp b res 0]
+    (if (not (= 0 (rem temp a)))
+      res
+      (recur (quot temp a) (inc res)))))
