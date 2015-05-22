@@ -2,234 +2,6 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
-;;problem 1 (lim 10.000.000)
-
-(defn eul-1-1
-  [lim]
-  (reduce +'
-    (filter #(or (= 0 (rem % 3))
-              (= 0 (rem % 5)))
-      (range 1 lim))))
-
-;;average 550 ms
-
-(defn eul-1-2
-  "using atom"
-  [lim]
-  (let [res (atom 0)]
-    (do
-      (doseq [i (range 1 lim)
-              :when (or (= 0 (rem i 3))
-                      (= 0 (rem i 5)))]
-        (swap! res +' i))
-      @res)))
-
-;;average 450 ms
-
-;;problem 2
-
-(defn lazy-fib
-  ([] (lazy-fib 1 1))
-  ([a b] (cons a (lazy-seq (lazy-fib b (+' a b))))))
-
-(defn eul-2-1
-  [lim]
-  (->> (lazy-fib)
-    (take-while #(< % lim))
-    (filter even?)
-    (reduce +')))
-
-;;problem 3
-
-(defn eul-3-1
-  [x]
-  (let [lim (int (Math/sqrt x))]
-    (last (filter #(= 0 (rem x %)) (m/primes-to lim)))))
-
-;;average 60 ms
-
-;;problem 4
-
-;;naive implementation
-
-(defn palin?
-  [x]
-  (let [st (str x)]
-    (= st (apply str (reverse st)))))
-
-(defn eul-4-1
-  [digit]
-  (let [lower-lim (reduce *' (repeat (dec digit) 10))
-        upper-lim (reduce *' (repeat digit 10))]
-    (->> (for [i (range lower-lim upper-lim)
-               j (range lower-lim upper-lim)
-               :when (> j i)
-               :when (or (= 0 (rem i 11))
-                       (= 0 (rem j 11)))
-               :let [x (* i j)]
-               :when (palin? x)]
-           x)
-      (apply max))))
-
-[913 993]
-
-;;average 85 ms
-
-(defn eul-4-2
-  [digit]
-  (let [lim (dec (reduce *' (repeat digit 10)))]
-    (loop [a lim b lim]
-      (let [x (*' a b)]
-        (if (palin? x)
-          (print a b x)
-          (if (and (= 6 (count (seq (str x))))
-                (> (* a b) (* a (dec a))))
-            (recur a (dec b))
-            (recur (dec a) lim)))))))
-
-;;still not done
-
-;;problem 5
-
-(defn count-div
-  [a b]
-  (loop [temp b res 0]
-    (if (not (= 0 (rem temp a)))
-      res
-      (recur (quot temp a) (inc res)))))
-
-(defn eul-5-1
-  [lim]
-  (let [ns (range 1 (inc lim))]
-    (->> (for [i (m/primes-to (inc lim))]
-           [i (->> ns
-                (filter #(= 0 (rem % i)))
-                (map #(count-div i %))
-                (apply max))])
-      (map #(let [[a b] %]
-             (reduce * (repeat b a))))
-      (reduce *'))))
-
-;;average 0.2 ms
-
-;;problem 6
-
-(defn eul-6-1
-  [lim]
-  (let [sum (*' lim (/ (inc lim) 2))]
-    (- (* sum sum)
-      (* (+ (* 2 lim) 1)
-        (inc lim)
-        (/ lim 6)))))
-
-
-;;problem 7
-
-;;next-prime
-
-(defn eul-7-1
-  [n]
-  (cond
-    (= 1 n) 2
-    :else (loop [i 3 res 2]
-            (if (= n res)
-              i
-              (let [next-i (+' i 2)]
-                (if (m/prime? next-i)
-                  (recur next-i (inc res))
-                  (recur next-i res)))))))
-
-;;problem 8
-
-(defn eul-8
-  []
-  (->> (slurp "resources/problem-8.txt")
-    clojure.string/split-lines
-    (map seq)
-    flatten
-    (mapv #(Integer/parseInt (str %)))))
-
-(defn eul-8-1
-  [n]
-  (let [refs (eul-8)]
-    (->> (for [i (range 0 (- (count refs) n))]
-           (->> refs
-             (drop i)
-             (take n)))
-      (filter #(nil? (some #{0} %)))
-      (map #(reduce *' %))
-      (apply max))))
-
-;;average 11-20 ms
-
-;;problem 9
-
-(defn eul-9-1®
-  [n]
-  (for [b (range 4 n)
-        c (range 3 n)
-        :let [a (- n b c)]
-        :when (and (> a b c)
-                (= (* a a)
-                  (+ (* b b)
-                    (* c c))))]
-    (* a b c)))
-
-;;problem 10
-
-(defn eul-10-1
-  [lim]
-  (reduce +' (m/primes-to lim)))
-
-;;avg 100 ms
-
-;;problem 11
-
-(defn eul-11
-  []
-  (->> (slurp "./resources/problem-11.txt")
-    (clojure.string/split-lines)
-    (mapv #(mapv (fn [a]
-                   (Integer/parseInt a))
-            (map str
-              (clojure.string/split % #" "))))))
-
-(defn eul-11-1
-  []
-  (let [refs (eul-11)
-        h1   (fn [i j]
-               (map #(get-in refs [i %])
-                 (range j (+ j 4))))
-        h2   (fn [i j]
-               (map #(get-in refs [(+ i 3) %])
-                 (range j (+ j 4))))
-        v1   (fn [i j]
-               (map #(get-in refs [% j])
-                 (range i (+ i 4))))
-        v2   (fn [i j]
-               (map #(get-in refs [% (+ j 3)])
-                 (range i (+ i 4))))
-        d1   (fn [i j]
-               (map #(get-in refs [%1 %2])
-                 (range i (+ i 4))
-                 (range j (+ j 4))))
-        d2   (fn [i j]
-               (map #(get-in refs [%1 %2])
-                 (range (+ 3 i) (dec i) -1)
-                 (range j (+ j 4))))
-        call (fn [i j]
-               (map (fn [f]
-                      (f i j))
-                 [h1 h2 v1 v2 d1 d2]))]
-    (->> (for [i (range 0 (- (count refs) 4))
-               j (range 0 (- (count refs) 4))]
-           (map #(reduce * %)
-             (call i j)))
-      (flatten)
-      (apply max))))
-
-;;average 16 ms
-
 ;;problem 12
 
 (defn gen-tri
@@ -292,116 +64,6 @@
 
 ;;too slow
 
-;;problem 13
-
-(defn eul-13-1
-  []
-  (->> (slurp "./resources/problem-13.txt")
-    (clojure.string/split-lines)
-    (map (fn [st]
-           (apply str (concat []
-                        [(first st)]
-                        ["."]
-                        (drop 1 st)))))
-    (map #(Double/parseDouble %))
-    (reduce +)
-    (str)
-    (seq)
-    (take 11)
-    (filter #(not (#{\.} %)))
-    (apply str)))
-
-;;average 3 ms
-
-;;problem 14
-
-(defn collatz-seq
-  [n]
-  (loop [i n c 1]
-    (if (>= 1 i)
-      c
-      (if (even? i)
-        (recur (/ i 2) (inc c))
-        (recur (+ (* 3 i) 1) (inc c))))))
-
-(defn eul-14-1
-  [lim]
-  (->> (range 2 lim)
-    (map (fn [a]
-           [a (collatz-seq a)]))
-    (sort-by last)
-    (last)))
-
-;;average 8800 ms
-
-;;;;problem 16
-
-(defn eul-16-1
-  [a n]
-  (->> (repeat n a)
-    (reduce *')
-    (str)
-    (seq)
-    (map #(Integer/parseInt (str %)))
-    (reduce +)))
-;;average 2.5 ms
-
-;;problem 17
-
-(defn one-nineteen
-  [n]
-  ((zipmap (range 0 20)
-     ["zero"
-      "one"
-      "two"
-      "three"
-      "four"
-      "five"
-      "six"
-      "seven"
-      "eight"
-      "nine"
-      "ten"
-      "eleven"
-      "twelve"
-      "thirteen"
-      "fourteen"
-      "fifteen"
-      "sixteen"
-      "seventeen"
-      "eighteen"
-      "nineteen"]) n))
-
-(defn twenty-ninety
-  [n]
-  ((zipmap (map #(* 10 %)
-             (range 2 10))
-     ["twenty"
-      "thirty"
-      "forty"
-      "fifty"
-      "sixty"
-      "seventy"
-      "eighty"
-      "ninety"]) n))
-
-
-(defn hundred
-  [n]
-  (str (one-nineteen (quot n 100)) "hundred"))
-
-(defn number-string
-  "1 -> one"
-  [n]
-  (cond
-    (= 1000 n) "onethousand"
-    (= 0 (rem n 100)) (hundred n)
-    (<= n 19) (one-nineteen n)
-    (and (< n 99)
-      (= 0 (rem n 10))) (twenty-ninety n)
-    (>= (quot n 100) 1) (str (hundred (* 100 (quot n 100))) "and" (number-string (rem n 100)))
-    (>= (quot n 10) 2) (str (twenty-ninety (* 10 (quot n 10))) (number-string (rem n 10)))
-    :else nil))
 
 ;;problem 32
 
@@ -793,21 +455,21 @@
             (recur (rest coll) (+ res (first coll)))))))))
 
 (defn num-roman [i] (loop [x i res []]
-                    (cond
-                      (>= x 1000) (recur (- x 1000) (conj res "M"))
-                      (>= x 900) (recur (- x 900) (conj res "CM"))
-                      (>= x 500) (recur (- x 500) (conj res "D"))
-                      (>= x 400) (recur (- x 400) (conj res "CD"))
-                      (>= x 100) (recur (- x 100) (conj res "C"))
-                      (>= x 90) (recur (- x 90) (conj res "XC"))
-                      (>= x 50) (recur (- x 50) (conj res "L"))
-                      (>= x 40) (recur (- x 40) (conj res "XL"))
-                      (>= x 10) (recur (- x 10) (conj res "X"))
-                      (>= x 9) (recur (- x 9) (conj res "IX"))
-                      (>= x 5) (recur (- x 5) (conj res "V"))
-                      (>= x 4) (recur (- x 4) (conj res "IV"))
-                      (>= x 1) (recur (- x 1) (conj res "I"))
-                      :else (apply str res))))
+                      (cond
+                        (>= x 1000) (recur (- x 1000) (conj res "M"))
+                        (>= x 900) (recur (- x 900) (conj res "CM"))
+                        (>= x 500) (recur (- x 500) (conj res "D"))
+                        (>= x 400) (recur (- x 400) (conj res "CD"))
+                        (>= x 100) (recur (- x 100) (conj res "C"))
+                        (>= x 90) (recur (- x 90) (conj res "XC"))
+                        (>= x 50) (recur (- x 50) (conj res "L"))
+                        (>= x 40) (recur (- x 40) (conj res "XL"))
+                        (>= x 10) (recur (- x 10) (conj res "X"))
+                        (>= x 9) (recur (- x 9) (conj res "IX"))
+                        (>= x 5) (recur (- x 5) (conj res "V"))
+                        (>= x 4) (recur (- x 4) (conj res "IV"))
+                        (>= x 1) (recur (- x 1) (conj res "I"))
+                        :else (apply str res))))
 
 (defn eul-89-1
   []
@@ -852,7 +514,7 @@
 
 (defn eul-60
   []
-  (let [p (drop 1 (m/primes-to 1000))
+  (let [p      (drop 1 (m/primes-to 1000))
         primes (concat (take 1 p)
                  (drop 2 p))]
     (for [i primes
