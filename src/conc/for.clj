@@ -18,3 +18,4 @@
     (if x
       (cons init (lazy-seq (reductions- f (f init x) xs)))
       [init])))
+
