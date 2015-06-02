@@ -2,22 +2,47 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;zenleague 4
+
+(def faktorial
+  (memoize (fn [n]
+             (if (>= 1 n)
+               1
+               (* n (faktorial (dec n)))))))
+(defn number-to-collumn
+  [n]
+  (loop [i n res []]
+    (if (< i 10)
+      (cons i res)
+      (recur (quot i 10)
+             (cons (rem i 10) res)))))
+
+(defn league4
+  [n]
+  (loop [i 1 res 0]
+    (if (> i n)
+      res
+      (recur (inc i)
+             (+ res (->> i
+                         number-to-collumn
+                         (map faktorial)
+                         (reduce +)))))))
 ;;problem 18
 
 (def eul-18
   (->> (slurp "./resources/problem-18.txt")
-    ((fn [coll]
-       (clojure.string/split coll #"] ")))
-    (map #(re-seq #"\d+" %))
-    (mapv (fn [coll]
-            (mapv #(Integer/parseInt %) coll)))))
+       ((fn [coll]
+          (clojure.string/split coll #"] ")))
+       (map #(re-seq #"\d+" %))
+       (mapv (fn [coll]
+               (mapv #(Integer/parseInt %) coll)))))
 
 (def get-path
   (memoize (fn get-path [i j]
              (if (= 14 i)
                (get-in eul-18 [i j])
-               (let [root  (get-in eul-18 [i j])
-                     left  (get-path (inc i) j)
+               (let [root (get-in eul-18 [i j])
+                     left (get-path (inc i) j)
                      right (get-path (inc i) (inc j))]
                  (if (> left right)
                    (+ root left)
@@ -33,19 +58,19 @@
 
 (def eul-67
   (->> (slurp "./resources/problem-67.txt")
-    (clojure.string/split-lines)
-    (mapv (fn [coll]
-            (mapv (fn [a]
-                    (Integer/parseInt a))
-              (clojure.string/split coll #" "))))))
+       (clojure.string/split-lines)
+       (mapv (fn [coll]
+               (mapv (fn [a]
+                       (Integer/parseInt a))
+                     (clojure.string/split coll #" "))))))
 
 (def get-path-2
   (memoize (fn [i j]
              (if (= i 99)
                (get-in eul-67 [i j])
                (+ (get-in eul-67 [i j])
-                 (max (get-path-2 (inc i) j)
-                   (get-path-2 (inc i) (inc j))))))))
+                  (max (get-path-2 (inc i) j)
+                       (get-path-2 (inc i) (inc j))))))))
 
 (defn eul-67-1
   []
@@ -63,15 +88,15 @@
 
 (defn eul-12-1
   [n]
-  (let [primes       (m/primes-to 100000)
-        lim          (last primes)
-        temp         (into-array (repeat lim {}))
+  (let [primes (m/primes-to 100000)
+        lim (last primes)
+        temp (into-array (repeat lim {}))
         update-array (fn [p]
                        (doseq [i (range p lim p)]
                          (aset temp i
-                           (assoc
-                             (aget temp i)
-                             p (m/count-div p i)))))]
+                               (assoc
+                                 (aget temp i)
+                                 p (m/count-div p i)))))]
     (do
       (doseq [p primes]
         (update-array p))
@@ -79,7 +104,7 @@
                                    (if (nil? v)
                                      0
                                      (apply + (conj v (count v)))))
-                              temp))]
+                                 temp))]
         (loop [[x & xs] (take-while #(< % lim) (gen-tri))]
           (if (nil? x)
             false
@@ -95,20 +120,20 @@
     (if (empty? p)
       {}
       (->> p
-        (filter #(zero? (rem n %)))
-        (map (fn [i]
-               {i (m/count-div i n)}))
-        (reduce #(merge %1 %2))))))
+           (filter #(zero? (rem n %)))
+           (map (fn [i]
+                  {i (m/count-div i n)}))
+           (reduce #(merge %1 %2))))))
 
 (defn eul-12-2
   [n]
   (loop [i 3 tri 3]
     (if (>= (let [v (vals (prime-fac tri))]
               (apply + (conj v (count v))))
-          n)
+            n)
       tri
       (recur (inc i)
-        (reduce + (range i 0 -1))))))
+             (reduce + (range i 0 -1))))))
 
 ;;too slow
 
@@ -137,15 +162,15 @@
              :let [ij (* i j)]
              :when (= 9 (apply + (map count-dig [i j ij])))
              :let [ij-set (->> [i j ij]
-                            (map str)
-                            (map seq)
-                            (flatten)
-                            (remove #(= \0 %))
-                            set)]
+                               (map str)
+                               (map seq)
+                               (flatten)
+                               (remove #(= \0 %))
+                               set)]
              :when (= 9 (count ij-set))]
          ij)
-    set
-    (reduce +)))
+       set
+       (reduce +)))
 
 ;;average 600 ms
 
@@ -157,16 +182,16 @@
              :let [n2 (* 2 n)]
              :when (= 9 (+ (count-dig n) (count-dig n2)))
              :let [n-set (->> [n n2]
-                           (map str)
-                           (map seq)
-                           (flatten)
-                           set
-                           (remove #(= \0 %))
-                           set)]
+                              (map str)
+                              (map seq)
+                              (flatten)
+                              set
+                              (remove #(= \0 %))
+                              set)]
              :when (= 9 (count n-set))]
          (Integer/parseInt (str n n2)))
-    (sort)
-    (last)))
+       (sort)
+       (last)))
 
 ;; average 167 ms
 
@@ -174,49 +199,49 @@
 
 (defn eul-43-cond
   [coll]
-  (let [d1     (not (= 0 (nth coll 0)))
+  (let [d1 (not (= 0 (nth coll 0)))
         d2d3d4 (let [d (take 3 (drop 1 coll))]
                  (= 0 (rem (->> d
-                             m/coll-integer)
-                        2)))
+                                m/coll-integer)
+                           2)))
         d3d4d5 (let [d (take 3 (drop 2 coll))]
                  (= 0 (rem (->> d
-                             m/coll-integer)
-                        3)))]
+                                m/coll-integer)
+                           3)))]
     (and d1 d2d3d4 d3d4d5)))
 
 (defn eul-43-1
   []
-  (let [ncoll-1   [1 4 6 0]
-        ncoll-2   [1 3 4 0]
-        coll-1    [3 5 7 2 8 9]
-        coll-2    [9 5 2 8 6 7]
+  (let [ncoll-1 [1 4 6 0]
+        ncoll-2 [1 3 4 0]
+        coll-1 [3 5 7 2 8 9]
+        coll-2 [9 5 2 8 6 7]
         calculate (fn [ncoll coll]
                     (let [permute-ncoll (m/n-permutes 4 ncoll)]
                       (->> permute-ncoll
-                        (map #(concat % coll))
-                        (filter eul-43-cond)
-                        (map m/coll-integer)
-                        (reduce +))))]
+                           (map #(concat % coll))
+                           (filter eul-43-cond)
+                           (map m/coll-integer)
+                           (reduce +))))]
     (+ (calculate ncoll-1 coll-1)
-      (calculate ncoll-2 coll-2))))
+       (calculate ncoll-2 coll-2))))
 
 ;;average 8 ms
 
 (defn eul-49-1
   []
   (let [primes (filter #(> % 1000)
-                 (m/primes-to 10000))]
+                       (m/primes-to 10000))]
     (for [i primes
           j primes
           :when (> i j)
           :let [diff (- i j)
-                j2   (+ j diff)]
+                j2 (+ j diff)]
           :when (and (m/prime? j2)
-                  (m/permutes? [j j2]))
+                     (m/permutes? [j j2]))
           :let [j3 (+ j2 diff)]
           :when (and (m/prime? j3)
-                  (m/permutes? [j j2 j3]))]
+                     (m/permutes? [j j2 j3]))]
       (str j j2 j3))))
 
 
@@ -233,12 +258,12 @@
    (let [[x y] root
          maybe-path (set (map (fn [a]
                                 (mapv #(- %1 %2)
-                                  root
-                                  a))
-                           [[-1 0]
-                            [1 0]
-                            [0 -1]
-                            [0 1]]))]
+                                      root
+                                      a))
+                              [[-1 0]
+                               [1 0]
+                               [0 -1]
+                               [0 1]]))]
      (clojure.set/intersection maybe-path set-path))))
 
 (defn check-path
@@ -248,13 +273,13 @@
                          nil
                          (let [maybe-path (set (map (fn [x]
                                                       (mapv #(- %1 %2)
-                                                        a
-                                                        x))
-                                                 [[-1 0]
-                                                  [1 0]
-                                                  [0 -1]
-                                                  [0 1]]))
-                               next       (some maybe-path [b])]
+                                                            a
+                                                            x))
+                                                    [[-1 0]
+                                                     [1 0]
+                                                     [0 -1]
+                                                     [0 1]]))
+                               next (some maybe-path [b])]
                            (if next
                              next
                              nil)))) coll))))
@@ -270,10 +295,10 @@
 (defn eul-83
   []
   (->> (slurp "./resources/problem-83.txt")
-    (clojure.string/split-lines)
-    (mapv (fn [coll]
-            (mapv #(Integer/parseInt (str %))
-              (clojure.string/split coll #","))))))
+       (clojure.string/split-lines)
+       (mapv (fn [coll]
+               (mapv #(Integer/parseInt (str %))
+                     (clojure.string/split coll #","))))))
 
 (defn eul-83-1
   [n]
@@ -288,7 +313,7 @@
       path
       (if (empty? set-path)
         []
-        (let [root      (first (take-last 1 (drop-last 1 path)))
+        (let [root (first (take-last 1 (drop-last 1 path)))
               next-step (path-find root set-path used)]
           (do
             (println path)
@@ -302,17 +327,17 @@
 (defn eul-54
   []
   (->> (slurp "test.txt")
-    (clojure.string/split-lines)
-    (mapv (fn [coll]
-            (->> (clojure.string/split coll #" ")
-              (partition 5)
-              (mapv vec))))))
+       (clojure.string/split-lines)
+       (mapv (fn [coll]
+               (->> (clojure.string/split coll #" ")
+                    (partition 5)
+                    (mapv vec))))))
 
 (defn one-pair?
   [numbers]
   (let [temp (->> numbers
-               (partition-by identity)
-               (filter #(= 2 (count %))))]
+                  (partition-by identity)
+                  (filter #(= 2 (count %))))]
     (if (= 1 (count temp))
       (ffirst temp)
       false)))
@@ -320,8 +345,8 @@
 (defn two-pair?
   [numbers]
   (let [temp (->> numbers
-               (partition-by identity)
-               (filter #(= 2 (count %))))]
+                  (partition-by identity)
+                  (filter #(= 2 (count %))))]
     (if (= 2 (count temp))
       (ffirst (take-last 1 temp))
       false)))
@@ -329,8 +354,8 @@
 (defn three-of-a-kind?
   [numbers]
   (let [temp (->> numbers
-               (partition-by identity)
-               (filter #(= 3 (count %))))]
+                  (partition-by identity)
+                  (filter #(= 3 (count %))))]
     (if (= 1 (count temp))
       (ffirst temp)
       false)))
@@ -345,7 +370,7 @@
                   b
                   nil)
                 nil))
-      num-coll)))
+            num-coll)))
 
 (defn flush?
   [syms]
@@ -361,9 +386,9 @@
 (defn four-of-a-kind?
   [numbers]
   (let [temp (first (->> numbers
-                      (partition-by identity)
-                      (sort-by count)
-                      (take-last 1)))]
+                         (partition-by identity)
+                         (sort-by count)
+                         (take-last 1)))]
     (if (= 4 (count temp))
       (first temp)
       false)))
@@ -371,38 +396,38 @@
 (defn straight-flush?
   [numbers syms]
   (if (and (straight? numbers)
-        (= 1 (count syms)))
+           (= 1 (count syms)))
     (last numbers)))
 
 (defn royal-straight-flush?
   [numbers syms]
   (and (= numbers [10 11 12 13 14])
-    (= 1 (count syms))))
+       (= 1 (count syms))))
 
 (defn cards-rank
   "[rank rank-properties numbers]"
   [card-coll]
-  (let [card-sym    (->> card-coll
+  (let [card-sym (->> card-coll
                       (map last)
                       (map str)
                       (set))
-        val-refs    (zipmap (map str (conj (vec (range 2 10)) "T" "J" "Q" "K" "A"))
-                      (range 2 15))
+        val-refs (zipmap (map str (conj (vec (range 2 10)) "T" "J" "Q" "K" "A"))
+                         (range 2 15))
         card-number (sort (map (fn [st]
                                  (val-refs st))
-                            (->> card-coll
-                              (map first)
-                              (map str))))
-        temp        [(vec (reverse card-number))]]
+                               (->> card-coll
+                                    (map first)
+                                    (map str))))
+        temp [(vec (reverse card-number))]]
     (let [royal-straight-flush (royal-straight-flush? card-number card-sym)
-          straight-flush       (straight-flush? card-number card-sym)
-          four-of-a-kind       (four-of-a-kind? card-number)
-          full-house           (full-house? card-number)
-          flush                (flush? card-sym)
-          straight             (straight? card-number)
-          three-of-a-kind      (three-of-a-kind? card-number)
-          two-pair             (two-pair? card-number)
-          one-pair             (one-pair? card-number)]
+          straight-flush (straight-flush? card-number card-sym)
+          four-of-a-kind (four-of-a-kind? card-number)
+          full-house (full-house? card-number)
+          flush (flush? card-sym)
+          straight (straight? card-number)
+          three-of-a-kind (three-of-a-kind? card-number)
+          two-pair (two-pair? card-number)
+          one-pair (one-pair? card-number)]
       (vec (cond
              royal-straight-flush (concat [10 0] temp)
              straight-flush (concat [9 straight-flush] temp)
@@ -418,7 +443,7 @@
 (defn highest-card
   [[h1 & h1s] [h2 & h2s]]
   (if (and (nil? h1)
-        (nil? h2))
+           (nil? h2))
     "p1"
     (cond
       (> h1 h2) "p1"
@@ -427,10 +452,10 @@
 
 (defn eul-54-1
   []
-  (let [cards  (eul-54)
-        ranks  (mapv (fn [coll]
-                       (mapv cards-rank coll))
-                 cards)
+  (let [cards (eul-54)
+        ranks (mapv (fn [coll]
+                      (mapv cards-rank coll))
+                    cards)
         winner (fn [[[f1 p1 h1] [f2 p2 h2]]]
                  (cond
                    (> f1 f2) "p1"
@@ -441,8 +466,8 @@
                                :else (highest-card h1 h2))
                    :else (highest-card h1 h2)))]
     (->> ranks
-      (map winner)
-      frequencies)))
+         (map winner)
+         frequencies)))
 
 ;;average 88 ms
 
@@ -454,12 +479,12 @@
   (if (< n 1000000000000000000)
     false
     (let [coll (->> n
-                 (str)
-                 (map str))
+                    (str)
+                    (map str))
           head (set (map #(Integer/parseInt %) (take 9 coll)))
           tail (set (map #(Integer/parseInt %) (take-last 9 coll)))]
       (if (or (some #{0} head)
-            (some #{0} tail))
+              (some #{0} tail))
         false
         (= 9 (count head) (count tail))))))
 
@@ -471,7 +496,7 @@
       (do
         (println c)
         (recur [b (+' a b)]
-          (inc c))))))
+               (inc c))))))
 
 ;; lama banget 2 game dota
 
@@ -480,7 +505,7 @@
 (defn roman
   []
   (->> (slurp "roman.txt")
-    (clojure.string/split-lines)))
+       (clojure.string/split-lines)))
 
 (defn rr
   [st]
@@ -522,13 +547,13 @@
 (defn eul-89-1
   []
   (time (->> (roman)
-          (map (fn [st]
-                 [(rr st) st]))
-          (map (fn [[n temp]]
-                 [(num-roman n) temp]))
-          (map (fn [[a b]]
-                 (- (count b) (count a))))
-          (reduce +))))
+             (map (fn [st]
+                    [(rr st) st]))
+             (map (fn [[n temp]]
+                    [(num-roman n) temp]))
+             (map (fn [[a b]]
+                    (- (count b) (count a))))
+             (reduce +))))
 
 ;; average 25 ms
 
@@ -537,19 +562,19 @@
 (defn eul-62-1
   [lim]
   (time (->> (map #(*' % % %) (range 1000 10000))
-          (map (fn [x]
-                 [x (vec (sort (m/number-collumn x)))]))
-          (group-by second)
-          (mapv (fn [[k v]]
-                  [(mapv first v)
-                   (count v)]))
-          (filter (fn [[k v]]
-                    (= v 5)))
-          (map (fn [[k v]]
-                 k))
-          (flatten)
-          (sort)
-          (first))))
+             (map (fn [x]
+                    [x (vec (sort (m/number-collumn x)))]))
+             (group-by second)
+             (mapv (fn [[k v]]
+                     [(mapv first v)
+                      (count v)]))
+             (filter (fn [[k v]]
+                       (= v 5)))
+             (map (fn [[k v]]
+                    k))
+             (flatten)
+             (sort)
+             (first))))
 
 ;;average 118 ms
 
@@ -562,17 +587,22 @@
 
 (defn eul-60
   []
-  (let [p      (drop 1 (m/primes-to 1000))
+  (let [p (drop 1 (m/primes-to 1000))
         primes (concat (take 1 p)
-                 (drop 2 p))]
+                       (drop 2 p))]
     (for [i primes
           j primes
           k primes
           :when (and (not (= i j k))
-                  (let [list-perm (m/n-permutes 2 [i j k])]
-                    (every? m/prime?
-                      (map join-number list-perm))))]
+                     (let [list-perm (m/n-permutes 2 [i j k])]
+                       (every? m/prime?
+                               (map join-number list-perm))))]
       [i j k])))
 
 ;;not done
 
+(->> (slurp "./resources/battery.txt")
+     (clojure.string/split-lines)
+     (map (fn [st]
+            (let [[percentage time] (clojure.string/split st #" ")]
+              [(apply str (take 2 percentage)) time]))))

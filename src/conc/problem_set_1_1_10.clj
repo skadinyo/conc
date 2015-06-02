@@ -44,9 +44,21 @@
 (defn eul-3-1
   [x]
   (let [lim (int (Math/sqrt x))]
-    (last (filter #(= 0 (rem x %)) (m/primes-to lim)))))
+    (take-last 1 (filter #(= 0 (rem x %)) (m/primes-to lim)))))
 
 ;;average 60 ms
+
+(defn eul-3-2
+  [n]
+  (loop [i n p 2]
+    (if (m/prime? i)
+      i
+      (recur (if (= 0 (rem i p))
+               (m/div-until i p)
+               i)
+             (m/next-prime p)))))
+
+;; average 4 ms
 
 ;;problem 4
 

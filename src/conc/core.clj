@@ -20,6 +20,16 @@
             false
             (recur (+' i 2))))))))
 
+(defn next-prime
+  [n]
+  (let [i (if (even? n)
+            (+ 1 n)
+            (+ 2 n))]
+    (loop [j i]
+      (if (prime? j)
+        j
+        (recur (+ 2 j))))))
+
 
 (defn primes-to
   [lim]
@@ -33,6 +43,13 @@
           (aset res j false)))
       (filter #(aget res %)
         (range 2 lim)))))
+
+(defn div-until
+  [n pembagi]
+  (loop [i n]
+    (if (= 0 (rem i pembagi))
+      (recur (quot i pembagi))
+      i)))
 
 (defn n-permutes
   [n coll]
