@@ -2,6 +2,161 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;eul 97
+
+(defn eul97
+  []
+  (loop [i 2 c 1]
+    (if (= c 7830457)
+      (rem (+ (* 28433 i) 1) 10000000000)
+      (recur (rem (*' i 2) 10000000000)
+             (inc c)))))
+
+;;eul57
+
+(defn count-num
+  [n]
+  (loop [c 1]
+    (let [d (reduce *' (repeat c 10))]
+      (if (> d n)
+        c
+        (recur (inc c))))))
+
+(defn eul57-1
+  []
+  (count (filter (fn [[a b]]
+                   (> (count-num a) (count-num b)))
+                 (take 1000 (iterate (fn [[n d]]
+                                       [(+' n (*' 2 d))
+                                        (+' n d)])
+                                     [3 2])))))
+
+
+
+
+
+;;
+
+(defn eul173
+  [n]
+  (let [[e1 e2] (loop [i 2 j 4]
+                  (let [ij (- (* j j) (* i i))]
+                    (if (> ij n)
+                      [i j]
+                      (recur (inc i)
+                             (inc j)))))
+        [o1 o2] (loop [i 1 j 3]
+                  (let [ij (- (* j j) (* i i))]
+                    (if (> ij n)
+                      [i j]
+                      (recur (inc i)
+                             (inc j)))))
+        even (for [i (range 2 (inc e2) 2)
+                   j (range 2 (inc e1) 2)
+                   :let [ij (- (* i i) (* j j))]
+                   :when (and (> i j)
+                              (<= ij n)
+                              (> ij 4))]
+               ij)
+        odd (for [i (range 1 (inc o1) 2)
+                  j (range 1 (inc o2) 2)
+                  :let [ij (- (* i i) (* j j))]
+                  :when (and (> i j)
+                             (<= ij n)
+                             (> ij 4))]
+              ij)]
+    (+ (count even) (count odd))))
+
+(defn eul173-2
+  [lim]
+  (let [tiles (quot lim 4)
+        l (int (Math/sqrt tiles))]
+    (do
+      (println tiles)
+      (println l)
+      (println (range 1 (inc l)))
+      (reduce + (for [i (range 1 (inc l))]
+                  (do
+                    (println (- (quot tiles i) i))
+                    (- (quot tiles i) i)))))))
+
+;;
+
+(defn bt [f & ar]
+  (loop [i (apply f ar)]
+    (if (fn? i)
+      (recur (i))
+      i)))
+
+(defn bb
+  [st]
+  (loop [s (filter #{\[ \] \{ \} \( \)} st)]
+    (if (or (nil? s)
+            (empty? s))
+      true
+      (if (= s "f")
+        false
+        (recur (let [s1 s
+                     s2 (rest s1)]
+                 (loop [[a & as] s1
+                        [b & bs] s2
+                        res []]
+                   (if (or (nil? a)
+                           (nil? b))
+                     "f"
+                     (if (#{[\[ \]]
+                            [\{ \}]
+                            [\( \)]} [a b])
+                       (concat res bs)
+                       (recur as bs (conj res a)))))))))))
+
+(defn jo [f]
+  (fn [& a]
+    (reduce (fn [a b]
+              (a b)) f a)))
+
+;;problem 3
+
+(defn prev-prime
+  [n]
+  (loop [i (if (even? n)
+             (- n 1)
+             (- n 2))]
+    (if (m/prime? i)
+      i
+      (recur (- i 2)))))
+
+(defn eul-3-2
+  [n]
+  (let [lim (prev-prime (int (inc (Math/sqrt n))))]
+    (loop [i lim]
+      (if (= 0 (rem n i))
+        i
+        (recur (prev-prime i))))))
+
+;;problem 96
+
+(def s1 [[0 0 3 0 2 0 6 0 0]
+         [9 0 0 3 0 5 0 0 1]
+         [0 0 1 8 0 6 4 0 0]
+         [0 0 8 1 0 2 9 0 0]
+         [7 0 0 0 0 0 0 0 8]
+         [0 0 6 7 0 8 2 0 0]
+         [0 0 2 6 0 9 5 0 0]
+         [8 0 0 2 0 3 0 0 9]
+         [0 0 5 0 1 0 3 0 0]])
+
+(defn solve-sudoku
+  [sudoku-array]
+  (let [all-post (for [i (range 0 10)
+                       j (range 0 10)]
+                   [i j])
+        check-position (fn [n]
+                         (set (filter #(= n (get-in sudoku-array %))
+                                      all-post)))]
+    (loop [i (check-position 9)])))
+;;
+
 ;;zenleague 4
 
 (def faktorial
@@ -111,6 +266,8 @@
             (if (>= (aget refs x) n)
               x
               (recur xs))))))))
+
+
 
 ;;sieve not done
 
