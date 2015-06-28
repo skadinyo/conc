@@ -2,6 +2,201 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 61
+
+
+
+;;generate palindrome from n
+(def num2seq (fn [n]
+               (loop [i n res []]
+                 (if (< i 10)
+                   (cons i res)
+                   (recur (quot i 10)
+                          (cons (rem i 10) res))))))
+
+(def palin? (fn [n]
+              (let [s (num2seq n)]
+                (= s (reverse s)))))
+
+(defn gen-palin
+  [num]
+  (let [num2seq (fn [n]
+                  (loop [i n res []]
+                    (if (< i 10)
+                      (cons i res)
+                      (recur (quot i 10)
+                             (cons (rem i 10) res)))))
+
+        palin? (fn [n]
+                 (let [s (num2seq n)]
+                   (= s (reverse s))))
+        count-num (fn [n]
+                    (loop [i 1 j 10]
+                      (if (< n j)
+                        i
+                        (recur (inc i)
+                               (* 10 j)))))
+        mid (fn [n]
+              (if (< n 10)
+                n
+                (let [s (num2seq n)
+                      c (count s)]
+                  (if (even? c)
+                    (take 2 (drop (dec (/ c 2)) s))
+                    (vector (nth s (+ 0.5 (/ c 2))))))))
+        seq2num (fn [coll]
+                  (reduce + (map * (reverse coll) (iterate #(* 10 %) 1))))
+        inc-add (fn [n]
+                  (let [c3 (let [x (mid n)]
+                             (or (= [9] x)
+                                 (= [9 9] x)))
+                        c2 (every? #{9} (rest (butlast (num2seq n))))
+                        c1 (every? #{9} (num2seq n))
+                        c (count-num n)
+                        adder (let [refs (reduce concat
+                                                 (take (/ c 2)
+                                                       (iterate (fn [coll]
+                                                                  (mapv #(*' 10 %) coll))
+                                                                [1 11])))
+                                    temp (nth refs (dec c))]
+                                (cond
+                                  c1 2
+                                  c2 (quot temp (cond
+                                                  (< c 6) 10
+                                                  (< c 8) 100
+                                                  (< c 10) 1000
+                                                  (< c 12) 1000))
+                                  c3 (quot temp 10)
+                                  :else temp))]
+                    (+ n adder)))
+        find-start-palin (fn find-start-palin [n]
+                           (if (palin? n)
+                             n (if (< n 10)
+                                 n
+                                 (let [s (num2seq n)
+                                       c (count s)
+                                       np (if (even? c)
+                                            (let [half (take (/ c 2) s)]
+                                              (seq2num (concat half (reverse half))))
+                                            (let [half (take (+ 0.5 (/ c 2)) s)]
+                                              (seq2num (concat half (drop 1 (reverse half))))))]
+                                   (if (> n np)
+                                     (let [y (first (drop-while #(> n %) (iterate inc-add np)))]
+                                       (if (palin? y)
+                                         y
+                                         (find-start-palin y)))
+                                     np)))))
+        next-palin (fn [z]
+                     (let [c (every? #{9} (num2seq z))
+                           ne (inc-add z)]
+                       (if c
+                         (+ z 2)
+                         (if (palin? ne)
+                           ne
+                           (find-start-palin ne)))))]
+    ;;(find-start-palin num)
+    (iterate next-palin (find-start-palin num))
+    ))
+
+(defn palindrome
+  [num]
+  (let [num2seq (fn [n]
+                  (loop [i n res []]
+                    (if (< i 10)
+                      (cons i res)
+                      (recur (quot i 10)
+                             (cons (rem i 10) res)))))
+        palin? (fn [n]
+                 (let [s (num2seq n)]
+                   (= s (reverse s))))
+        count-num (fn [n]
+                    (loop [i 1 j 10]
+                      (if (< n j)
+                        i
+                        (recur (inc i)
+                               (* 10 j)))))
+        mid (fn [x]
+              (let [i (count-num x)
+                    is (num2seq x)]
+                (if (odd? i)
+                  (nth is (int (/ i 2)))
+                  (if (= [9 9] (take 2 (drop (dec (/ i 2)) is)))
+                    9))))
+        seq2num (fn [coll]
+                  (reduce + (map * (reverse coll) (iterate #(* 10 %) 1))))
+        palin-adder (fn [n]
+                      (let [c (count-num n)
+                            ns (num2seq n)
+                            divid ()
+                            refs (reduce concat
+                                         (take (/ c 2)
+                                               (iterate (fn [coll]
+                                                          (mapv #(*' 10 %) coll))
+                                                        [1 11])))
+                            temp (nth refs (dec c))]
+                        (if (every? #{9} ns)
+                          (+ n 2)
+                          (let [ns (rest (butlast ns))
+                                ms (mid n)
+                                os [(first ns) (last ns)]]
+                            (if (and (= 9 ms)
+                                     (= 1 (count (set os))))
+                              (+ n (nth refs (if (odd? c)
+                                               (if (< c 5)
+                                                 (- c 2)
+                                                 1)
+                                               (- c 3))))
+                              (+ n temp))))))]
+    (drop-while #(> num %)) (iterate palin-adder 0)))
+
+
+;;eul205
+
+(defn d4
+  []
+  (inc (rand-int 4)))
+
+(defn d6
+  []
+  (inc (rand-int 6)))
+
+(defn eul205-1
+  [lim]
+  (let [c (ref 0)]
+    (do
+      (pmap (fn [a]
+              (let [peter (apply + (repeatedly 9 d4))
+                    colin (apply + (repeatedly 6 d6))]
+                (if (> peter colin)
+                  (dosync
+                    (commute c inc)))))
+            (repeat lim 1))
+      (/ @c lim 1.0000000000))))
+
+(defn eul205-2
+  [lim]
+  (loop [c 0 cou 0]
+    (if (= c lim)
+      (/ cou lim 1.00000000000000)
+      (recur (inc c)
+             (if (> (apply + (repeatedly 9 d4))
+                    (apply + (repeatedly 6 d6)))
+               (inc cou)
+               cou)))))
+
+(defn eul205-1
+  [lim]
+  (loop [c 0 res 0]
+    (let [pete (reduce + (repeatedly 9 d4))
+          colin (reduce + (repeatedly 6 d6))]
+      (if (= lim c)
+        (/ res c 1.00000000000)
+        (recur (inc c)
+               (if (> pete colin)
+                 (inc res)
+                 res))))))
+
+
 ;;eul 97
 
 (defn eul97
@@ -30,10 +225,6 @@
                                        [(+' n (*' 2 d))
                                         (+' n d)])
                                      [3 2])))))
-
-
-
-
 
 ;;
 
