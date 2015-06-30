@@ -1,6 +1,86 @@
 (ns conc.alpha
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
+;;problem 315
+
+(defn clock-seq
+  [n]
+  (let [ns (vec (m/number-coll n))]
+    (if (< n 10)
+      [[n]]
+      (loop [coll ns
+             res []]
+        (let [x (reduce + coll)]
+          (if (< x 10)
+            (conj res coll [x])
+            (recur (vec (m/number-coll x))
+                   (conj res coll))))))))
+
+(def nil-num
+  (zipmap (range 0 10) [6 2 5 5 4 5 6 4 7 6]))
+
+(def number-clock
+  {0 [1 1 1 1 1 1 0]
+   1 [0 1 1 0 0 0 0]
+   2 [1 1 0 1 1 0 1]
+   3 [1 1 1 1 0 0 1]
+   4 [0 1 1 0 0 1 1]
+   5 [1 0 1 1 0 1 1]
+   6 [1 0 1 1 1 1 1]
+   7 [1 1 1 0 0 1 0]
+   8 [1 1 1 1 1 1 1]
+   9 [1 1 1 1 0 1 1]})
+
+(defn sam-seq
+  [n]
+  (concat [nil] (mapcat masuk
+                        (clock-seq n)
+                        (repeat nil))))
+
+(defn calculate-trans
+  [coll]
+  (reduce + (map nil-num coll)))
+
+(defn calculate-sam
+  [n]
+  (let [ns (sam-seq n)]
+    (*' 2 (reduce +' (map calculate-trans ns)))))
+
+;;63424722
+
+(defn calculate-diff
+  [start end]
+  (let [start-coll (map number-clock start)
+        end-coll (map number-clock end)]
+    (apply + (map (fn [xcoll ycoll]
+                    (apply + (map (fn [a b]
+                                    (cond
+                                      (= [1 1] [a b]) 0
+                                      (= [0 0] [a b]) 0
+                                      :else 1)) xcoll ycoll)))
+                  start-coll end-coll))))
+
+(defn calculate-max
+  [n]
+   (let [ns (clock-seq n)]
+    (+ (calculate-trans (first ns))
+       (calculate-trans (last ns))
+       (loop [[x1 x2 & xs] ns res 0]
+         (let [c1 (count x1)
+               c2 (count x2)
+               cd (- c1 c2)
+               dx1 (drop cd x1)
+               pala (calculate-trans (take cd x1))]
+           (if (nil? x2)
+             res
+             (recur (concat [x2] xs)
+                    (+ res pala (calculate-diff dx1 x2)))))))))
+
+;;problem 65
+
+(defn mul
+  []
+  (let []))
 
 ;;provlem 206
 
@@ -41,6 +121,21 @@
         toti (memoize tot-chain)]
     (filter #(= 25 %) (map toti (repeat tot) p))))
 
+;;problem 357
+
+(defn prime-fac?
+  [n]
+  (let [p (m/primes-to (inc n))]
+    (= 1 (->> p
+              (filter #(= 0 (rem n %)))
+              (reduce / n)))))
+
+(let [ps (m/primes-to 1000)
+      p-set (set ps)]
+  (->> ps
+       (filter #(= 3 (rem % 4)))
+       (filter #(p-set (+ (/ (dec %) 2) 2)))
+       (map dec)))
 
 ;;problem 80
 
