@@ -2,8 +2,229 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;provlem 206
+
+(def init206
+  [1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9])
+
+(defn masuk
+  [a b]
+  [a b])
+
+(defn interleave???
+  [coll]
+  (conj (vec (mapcat masuk (range 1 9) coll)) 9))
+
+(defn wrap-it!
+  [n]
+  (m/coll-integer (interleave??? (m/number-coll n))))
+
+(defn eul-296-1
+  []
+  (loop [i 99999999]
+    (if (m/psquare? (wrap-it! i))
+      (Math/sqrt (wrap-it! i))
+      (recur (dec i)))))
+
+;;probem214
+
+(defn tot-chain
+  [refs x]
+  (if (= 2 x)
+    2
+    (+ 1 (tot-chain refs (refs x)))))
+
+(defn eul-214-1
+  [lim]
+  (let [tot (into {} (m/totient-to lim))
+        p (m/primes-to lim)
+        toti (memoize tot-chain)]
+    (filter #(= 25 %) (map toti (repeat tot) p))))
+
+
+;;problem 80
+
+(defn nsqrt
+  [n]
+  (let [as (*' 5 n)
+        bs 5
+        r (fn [[a b]]
+            (if (>= a b)
+              [(-' a b) (+' b 10)]
+              [(*' a 100) (let [i (quot b 10)
+                                j (rem b 10)]
+                            (+' (*' 100 i)
+                                j))]))]
+    (iterate r [as bs])))
+
+(defn eul-80
+  [lim]
+  (let [limit (reduce *' (repeat 101 10))
+        n (take-while #(< (last %) limit)
+                      (nsqrt lim))]
+    (/ (last (last n)) 100)))
+
+;; problem 164
+
+(defn c164
+  ([] (map c164 (repeat 1) (range 0 10)))
+  ([p n] (if (= p 10)
+           ())))
+
+;;problem 345
+
+(def mat
+  (->> "  7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
+627 343 773 959 943 767 473 103 699 303 957 703 583 639 913
+447 283 463  29  23 487 463 993 119 883 327 493 423 159 743
+217 623   3 399 853 407 103 983  89 463 290 516 212 462 350
+960 376 682 962 300 780 486 502 912 800 250 346 172 812 350
+870 456 192 162 593 473 915  45 989 873 823 965 425 329 803
+973 965 905 919 133 673 665 235 509 613 673 815 165 992 326
+322 148 972 962 286 255 941 541 265 323 925 281 601  95 973
+445 721  11 525 473  65 511 164 138 672  18 428 154 448 848
+414 456 310 312 798 104 566 520 302 248 694 976 430 392 198
+184 829 373 181 631 101 969 613 840 740 778 458 284 760 390
+821 461 843 513  17 901 711 993 293 157 274  94 192 156 574
+ 34 124   4 878 450 476 712 914 838 669 875 299 823 329 699
+815 559 813 459 522 788 168 586 966 232 308 833 251 631 107
+813 883 451 509 615  77 281 613 459 205 380 274 302  35 805"
+       (clojure.string/split-lines)
+       (map #(clojure.string/split % #" "))
+       (map #(remove (fn [st] (= "" st)) %))
+       (mapv (fn [coll] (mapv #(Integer/parseInt %) coll)))))
+
+(def mat
+  (->> " 7  53 183 439 863
+497 383 563  79 973
+287  63 343 169 583
+627 343 773 959 943
+767 473 103 699 303"
+       (clojure.string/split-lines)
+       (map #(clojure.string/split % #" "))
+       (map #(remove (fn [st] (= "" st)) %))
+       (mapv (fn [coll] (mapv #(Integer/parseInt %) coll))))
+  )
+
+(defn call
+  [states [ir jr]]
+  (let [is (for [i (range 0 5)
+                 :when (nil? (states i))]
+             [i (inc jr)])]
+    is))
+
+(defn eul-345-1
+  []
+  (let []))
+
+;;problem 60
+
+(defn eul-60-1
+  [n]
+  (let [pps (m/primes-to n)
+        ps (take-while #(< % n) pps)
+        sps (set ps)]
+    (set (for [i ps
+               j ps
+               :let [ij (Integer/parseInt (str i j))
+                     ji (Integer/parseInt (str j i))]
+               :when (and (not (= i j))
+                          (and (if (> ij n)
+                                 (m/prime? ij)
+                                 (sps ij))
+                               (if (> ji n)
+                                 (m/prime? ji)
+                                 (sps ji))))]
+           #{i j}))))
+
+;;problem 66
+
+(defn sq
+  [n]
+  (* n n))
+
+(defn psq?
+  [n]
+  (let [sqrt (Math/sqrt n)]
+    (== sqrt (int sqrt))))
+
+(defn eul-66
+  [lim]
+  (let [f (fn [i]
+            [i (set (for [x (range 1 lim)
+                          y (range 1 lim)
+                          :while (= (* i (sq y)) (- (sq x) 1))]
+                      x))])]
+    (->> (range 1 1000)
+         (remove psq?)
+         (map f)
+         (filter #(not (empty? (last %)))))))
+
 ;;problem 61
 
+(defn gen-3
+  []
+  (let [next-i (fn [[i n]]
+                 [(/ (* n (+ n 1)) 2)
+                  (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn gen-4
+  []
+  (let [next-i (fn [[i n]]
+                 1 [(* n n)
+                    (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn gen-5
+  []
+  (let [next-i (fn [[i n]]
+                 [(/ (* n (+ (* 3 n) -1)) 2)
+                  (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn gen-6
+  []
+  (let [next-i (fn [[i n]]
+                 [(* n (+ (* 2 n) -1))
+                  (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn gen-7
+  []
+  (let [next-i (fn [[i n]]
+                 [(/ (* n (+ (* 5 n) -3)) 2)
+                  (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn gen-8
+  []
+  (let [next-i (fn [[i n]]
+                 [(* n (+ (* 3 n) -2))
+                  (inc n)])]
+    (iterate next-i [1 2])))
+
+(defn take-4
+  [f]
+  (map first (drop-while #(< (first %) 999) (take-while #(< (first %) 10000) (f)))))
+
+(defn make-set
+  [n]
+  (let [f (quot n 100)
+        b (rem n 100)
+        two (fn [i]
+              [(quot i 10) (rem i 10)])]
+    {(set (two f)) (set (two b))}))
+
+(defn eul-61-1
+  []
+  (let [gen (fn [f]
+              (->> f
+                   (take-4)
+                   (map make-set)))
+        [i3 i4 i5 i6 i7 i8] (->> [gen-3 gen-4 gen-5 gen-6 gen-7 gen-7]
+                                 (map gen))]
+    (filter #(% (ffirst i3)) i4)))
 
 
 ;;generate palindrome from n
@@ -13,6 +234,33 @@
                    (cons i res)
                    (recur (quot i 10)
                           (cons (rem i 10) res))))))
+
+
+;;---
+
+;;problem 70
+
+(defn perm?
+  [a b]
+  (let [as (sort (num2seq a))
+        bs (sort (num2seq b))]
+    (and (= (count as)
+            (count bs))
+         (= as
+            bs))))
+
+(defn eul-70-1
+  []
+  (time (->> (m/totient-to 10000000)
+             (filter #(apply perm? %))
+             (map (fn [[a b]]
+                    [a b (/ a b)]))
+             (sort-by last)
+             (take 2)
+             (last)
+             (first))))
+
+;;---
 
 (def palin? (fn [n]
               (let [s (num2seq n)]

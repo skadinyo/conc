@@ -44,6 +44,21 @@
       (filter #(aget res %)
         (range 2 lim)))))
 
+(defn totient-to
+  [lim]
+  (let [p (set (primes-to lim))
+        tot (int-array (range 0 lim))]
+    (do
+      (doseq [ip p]
+        (doseq [i (range (* 2 ip) lim ip)]
+          (aset tot i (int (* (aget tot i)
+                              (- 1 (/ 1 ip)))))))
+      (map (fn [i]
+             (if (p i)
+               [i (dec i)]
+               [i (aget tot i)]))
+           (range 1 lim)))))
+
 (defn div-until
   [n pembagi]
   (loop [i n]
@@ -132,3 +147,8 @@
     (if (not (= 0 (rem temp a)))
       res
       (recur (quot temp a) (inc res)))))
+
+(defn psquare?
+  [n]
+  (let [sn (Math/sqrt n)]
+    (== sn (int sn))))
