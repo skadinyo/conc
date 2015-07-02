@@ -1,6 +1,25 @@
 (ns conc.alpha
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
+;;provlem 65
+
+(defn eul-65-1
+  []
+  (time (reduce +
+                (m/number-coll
+                  (loop [[m & ms] (drop 1
+                                        (take 98
+                                              (flatten
+                                                (interleave (range 2 10000 2)
+                                                            (repeat [1 1])))))
+                         [n1 n2] [3 8]]
+                    (do
+                      (println n1 n2 m)
+                      (if (nil? m)
+                        n2
+                        (recur ms
+                               [n2 (+' (*' n2 m) n1)]))))))))
+
 ;;problem 315
 
 (defn clock-seq
