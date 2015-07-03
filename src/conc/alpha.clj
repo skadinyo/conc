@@ -2,6 +2,39 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 60
+
+(defn concat-number
+  [a b]
+  (let [as (m/number-coll a)
+        bs (m/number-coll b)]
+    (m/coll-integer (concat as bs))))
+
+(defn eul-60-1
+  []
+  (let [primes-all (m/primes-to 1000000)
+        primes (take-while #(< % 10000))
+        refs (set primes-all)
+        p? (fn [x]
+             (if (> x 1000000)
+               (m/prime? x)
+               (some #{x} refs)))
+        pair-prime? (fn [coll]
+                      (let [pair (m/n-permutes 2 coll)]
+                        (loop [[p & ps] pair]
+                          (if p
+                            (if (p? (apply concat-number p))
+                              (recur ps)
+                              false)
+                            true))))]
+    ))
+
+;;generate palindrome
+
+(defn gen-palin
+  []
+  ())
+
 ;;problem 132
 
 (defn n-repunit
