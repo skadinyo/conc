@@ -1,6 +1,40 @@
 (ns conc.alpha
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
+
+;;problem 132
+
+(defn n-repunit
+  [n]
+  (m/coll-integer (repeat n 1)))
+
+(defn eul-132
+  [n]
+  (let [repunit (n-repunit n)]
+    (loop [i 2 temp repunit res []]
+      (if (or (= 1 temp)
+              (= 49 (count res)))
+        res
+        (let [x (m/div-until temp i)]
+          (recur (m/next-prime i)
+                 x
+                 (if (= x temp)
+                   res
+                   (conj res i))))))))
+
+;;problem 124
+
+(defn eul-124
+  [n lim]
+  (let [radicals (int-array (repeat (inc lim) 1))
+        sieve-n (fn [x]
+                  (doseq [i (range x (inc lim) x)]
+                    (aset radicals i (* (aget radicals i) x))))]
+    (do
+      (doseq [i (m/primes-to (inc lim))]
+        (sieve-n i))
+      (vec radicals))))
+
 ;;provlem 65
 
 (defn eul-65-1
@@ -20,112 +54,9 @@
                         (recur ms
                                [n2 (+' (*' n2 m) n1)]))))))))
 
-;;problem 315
 
-(defn clock-seq
-  [n]
-  (let [ns (vec (m/number-coll n))]
-    (if (< n 10)
-      [[n]]
-      (loop [coll ns
-             res []]
-        (let [x (reduce + coll)]
-          (if (< x 10)
-            (conj res coll [x])
-            (recur (vec (m/number-coll x))
-                   (conj res coll))))))))
 
-(def nil-num
-  (zipmap (range 0 10) [6 2 5 5 4 5 6 4 7 6]))
-
-(def number-clock
-  {0 [1 1 1 1 1 1 0]
-   1 [0 1 1 0 0 0 0]
-   2 [1 1 0 1 1 0 1]
-   3 [1 1 1 1 0 0 1]
-   4 [0 1 1 0 0 1 1]
-   5 [1 0 1 1 0 1 1]
-   6 [1 0 1 1 1 1 1]
-   7 [1 1 1 0 0 1 0]
-   8 [1 1 1 1 1 1 1]
-   9 [1 1 1 1 0 1 1]})
-
-(defn sam-seq
-  [n]
-  (concat [nil] (mapcat masuk
-                        (clock-seq n)
-                        (repeat nil))))
-
-(defn calculate-trans
-  [coll]
-  (reduce + (map nil-num coll)))
-
-(defn calculate-sam
-  [n]
-  (let [ns (sam-seq n)]
-    (*' 2 (reduce +' (map calculate-trans ns)))))
-
-;;63424722
-
-(defn calculate-diff
-  [start end]
-  (let [start-coll (map number-clock start)
-        end-coll (map number-clock end)]
-    (apply + (map (fn [xcoll ycoll]
-                    (apply + (map (fn [a b]
-                                    (cond
-                                      (= [1 1] [a b]) 0
-                                      (= [0 0] [a b]) 0
-                                      :else 1)) xcoll ycoll)))
-                  start-coll end-coll))))
-
-(defn calculate-max
-  [n]
-   (let [ns (clock-seq n)]
-    (+ (calculate-trans (first ns))
-       (calculate-trans (last ns))
-       (loop [[x1 x2 & xs] ns res 0]
-         (let [c1 (count x1)
-               c2 (count x2)
-               cd (- c1 c2)
-               dx1 (drop cd x1)
-               pala (calculate-trans (take cd x1))]
-           (if (nil? x2)
-             res
-             (recur (concat [x2] xs)
-                    (+ res pala (calculate-diff dx1 x2)))))))))
-
-;;problem 65
-
-(defn mul
-  []
-  (let []))
-
-;;provlem 206
-
-(def init206
-  [1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9])
-
-(defn masuk
-  [a b]
-  [a b])
-
-(defn interleave???
-  [coll]
-  (conj (vec (mapcat masuk (range 1 9) coll)) 9))
-
-(defn wrap-it!
-  [n]
-  (m/coll-integer (interleave??? (m/number-coll n))))
-
-(defn eul-296-1
-  []
-  (loop [i 99999999]
-    (if (m/psquare? (wrap-it! i))
-      (Math/sqrt (wrap-it! i))
-      (recur (dec i)))))
-
-;;probem214
+;;probem214 -notdone
 
 (defn tot-chain
   [refs x]
@@ -140,7 +71,7 @@
         toti (memoize tot-chain)]
     (filter #(= 25 %) (map toti (repeat tot) p))))
 
-;;problem 357
+;;problem 357 -notdone
 
 (defn prime-fac?
   [n]
@@ -156,27 +87,7 @@
        (filter #(p-set (+ (/ (dec %) 2) 2)))
        (map dec)))
 
-;;problem 80
 
-(defn nsqrt
-  [n]
-  (let [as (*' 5 n)
-        bs 5
-        r (fn [[a b]]
-            (if (>= a b)
-              [(-' a b) (+' b 10)]
-              [(*' a 100) (let [i (quot b 10)
-                                j (rem b 10)]
-                            (+' (*' 100 i)
-                                j))]))]
-    (iterate r [as bs])))
-
-(defn eul-80
-  [lim]
-  (let [limit (reduce *' (repeat 101 10))
-        n (take-while #(< (last %) limit)
-                      (nsqrt lim))]
-    (/ (last (last n)) 100)))
 
 ;; problem 164
 
@@ -185,7 +96,7 @@
   ([p n] (if (= p 10)
            ())))
 
-;;problem 345
+;;problem 345 -notdone
 
 (def mat
   (->> "  7  53 183 439 863 497 383 563  79 973 287  63 343 169 583
@@ -231,7 +142,7 @@
   []
   (let []))
 
-;;problem 60
+;;problem 60 -notdone
 
 (defn eul-60-1
   [n]
@@ -251,7 +162,7 @@
                                  (sps ji))))]
            #{i j}))))
 
-;;problem 66
+;;problem 66 -notdone
 
 (defn sq
   [n]
@@ -274,7 +185,7 @@
          (map f)
          (filter #(not (empty? (last %)))))))
 
-;;problem 61
+;;problem 61 -notdone
 
 (defn gen-3
   []
@@ -559,36 +470,10 @@
                  res))))))
 
 
-;;eul 97
 
-(defn eul97
-  []
-  (loop [i 2 c 1]
-    (if (= c 7830457)
-      (rem (+ (* 28433 i) 1) 10000000000)
-      (recur (rem (*' i 2) 10000000000)
-             (inc c)))))
 
-;;eul57
 
-(defn count-num
-  [n]
-  (loop [c 1]
-    (let [d (reduce *' (repeat c 10))]
-      (if (> d n)
-        c
-        (recur (inc c))))))
-
-(defn eul57-1
-  []
-  (count (filter (fn [[a b]]
-                   (> (count-num a) (count-num b)))
-                 (take 1000 (iterate (fn [[n d]]
-                                       [(+' n (*' 2 d))
-                                        (+' n d)])
-                                     [3 2])))))
-
-;;
+;;problem 173 -notdone
 
 (defn eul173
   [n]
@@ -632,41 +517,6 @@
                   (do
                     (println (- (quot tiles i) i))
                     (- (quot tiles i) i)))))))
-
-;;
-
-(defn bt [f & ar]
-  (loop [i (apply f ar)]
-    (if (fn? i)
-      (recur (i))
-      i)))
-
-(defn bb
-  [st]
-  (loop [s (filter #{\[ \] \{ \} \( \)} st)]
-    (if (or (nil? s)
-            (empty? s))
-      true
-      (if (= s "f")
-        false
-        (recur (let [s1 s
-                     s2 (rest s1)]
-                 (loop [[a & as] s1
-                        [b & bs] s2
-                        res []]
-                   (if (or (nil? a)
-                           (nil? b))
-                     "f"
-                     (if (#{[\[ \]]
-                            [\{ \}]
-                            [\( \)]} [a b])
-                       (concat res bs)
-                       (recur as bs (conj res a)))))))))))
-
-(defn jo [f]
-  (fn [& a]
-    (reduce (fn [a b]
-              (a b)) f a)))
 
 ;;problem 3
 
