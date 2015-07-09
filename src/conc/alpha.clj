@@ -2,6 +2,101 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 512
+
+(defn odd-totient-to
+  [lim]
+  (let [p (m/primes-tox lim)
+        tot (long-array (range 0 lim))]
+    (do
+      (doseq [ip p]
+        (do
+          (aset tot ip (dec ip))
+          (doseq [i (filter odd? (range (*' 2 ip) lim ip))]
+            (aset tot i (int (/ (*' (aget tot i) (dec ip))
+                                 ip))))))
+      (reduce +' (map #(aget tot %) (range 1 lim 2))))))
+
+;;problem 187
+
+(defn eul-187-1
+  [lim]
+  (let [res (atom 0)
+        ps (m/primes-tox (/ lim 2))
+        p (m/primes-tox (Math/sqrt lim))]
+    (do (doseq [i p]
+          (doseq [j (take-while #(> lim (* i %)) (drop-while #(< % i) ps))]
+            (swap! res inc)))
+        @res)))
+
+(defn eul-187-2
+  [lim]
+  (let [ps (m/primes-tox (/ lim 2))
+        l (Math/sqrt lim)
+        p (take-while #(< % l) ps)]
+    (loop [[i & is] p res 0]
+      (if i
+        (recur is
+               (+ res (count (take-while #(> lim (* i %)) (drop-while #(< % i) ps)))))
+        res))))
+
+(defn eul-187-3
+  [lim]
+  (let [ps (m/primes-tox (/ lim 2))
+        l (Math/sqrt lim)
+        p (take-while #(< % l) ps)]
+    (apply + (pmap #(count (->> ps
+                                (drop-while (fn [x]
+                                              (< x %)))
+                                (take-while (fn [x]
+                                              (> lim (* % x))))))
+                   p))))
+
+;;problem 204
+
+(defn remove-primefac
+  [n prime-coll]
+  (reduce (fn [coll r]
+            (remove #(= 0 (rem % r)) coll)) (range 1 n) prime-coll))
+
+(def primes [2 3 5])
+
+(def limit 100000000)
+
+(defn p204
+  [n]
+  (if (> n limit)
+    [0]
+    (concat [n]
+            (p204 (* n 2))
+            (p204 (* n 3))
+            (p204 (* n 5)))))
+
+(def pp (memoize p204))
+
+(defn eul-204-1
+  [n lim]
+  (let [ps (m/primes-to (inc n))
+        c (fn [p]
+            (take-while #(< % lim) (iterate #(* % p) p)))
+        asu (map c ps)]
+    (loop [[x & xs] asu res #{1}]
+      (if x
+        (let [temp (set (for [i x
+                              j res
+                              :let [ij (* i j)]
+                              :when (<= ij lim)]
+                          ij))]
+          (recur xs
+                 (clojure.set/union res temp (set x))))
+        (count res)))))
+
+;;problem 12
+
+(defn g-tri
+  []
+  (map #(/ (* % (inc %)) 2) (range)))
+
 ;;problem 60
 
 (defn concat-number
