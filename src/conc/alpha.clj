@@ -2,6 +2,42 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 95
+
+(defn eul-95-1
+  ([n] (eul-95-1 n 200))
+  ([n lim]
+   (let [fac (int-array (repeat lim 1))
+         sieve-fac (fn [x]
+                     (doseq [i (range (+ x x) lim x)]
+                       (aset fac i (+ x (aget fac i)))))
+         find-ami (fn [x]
+                    (loop [i (get fac x) temp #{}]
+                      (let [ne (get fac i)]
+                        (if (or (temp i)
+                                (> i lim))
+                          (count temp)
+                          (recur ne
+                                 (conj temp i))))))]
+     (do
+       (doseq [i (range 2 (quot lim 2))]
+         (do
+           (println i)
+           (sieve-fac i)))
+       (loop [i 2 res [0 0]]
+         (if (= i lim)
+           res
+           (let [a (find-ami i)]
+             (do
+               (println i a)
+               (recur (inc i)
+                      (if (and (> a (last res))
+                               (< a 1000000))
+                        [i a]
+                        res))))))))))
+
+
+
 ;;problem 512
 
 (defn odd-totient-to
@@ -14,7 +50,7 @@
           (aset tot ip (dec ip))
           (doseq [i (filter odd? (range (*' 2 ip) lim ip))]
             (aset tot i (int (/ (*' (aget tot i) (dec ip))
-                                 ip))))))
+                                ip))))))
       (reduce +' (map #(aget tot %) (range 1 lim 2))))))
 
 ;;problem 187
