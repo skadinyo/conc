@@ -2,6 +2,30 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+;;problem 71
+
+(defn eul-71-1
+  [x]
+  (- (* 3/7 x) 1))
+
+;;no need to give the time ;)
+
+(defn eul-71-2
+  [lim]
+  ())
+(defn eul-73-1
+  []
+  (time (->> (for [d (range 1 (inc 12000))
+                   n (range 1 d)
+                   :let [nd (/ n d)]
+                   :when (and (< nd 1/2)
+                              (> nd 1/3))]
+               nd)
+             (distinct)
+             (count))))
+
+;; FUCKING BRUTE AND DUMB DUMB FORCE "Elapsed time: 448661.553735 msecs"
+
 ;;problem 95
 
 (defn eul-95-1
