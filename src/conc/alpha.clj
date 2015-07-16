@@ -2,6 +2,59 @@
   (require [clojure.core.reducers :as r]
            [conc.core :as m]))
 
+(defn print-print
+  [coll]
+  (doseq [i coll]
+    (println i)))
+
+;;problem 32
+
+(def c [200 100 50 20 10 5 2 1])
+
+(defn eul-32
+  ([] (eul-32 200 c))
+  ([n coin]
+   (cond
+     (< n 0) 0
+     (<= n 1) 1
+     (empty? coin) 0
+     :else (+ (eul-32 (- n (first coin)) coin)
+              (eul-32 n (rest coin))))))
+
+(def e32 (memoize eul-32))
+
+;;problem 77
+
+(def p [2 3 5 7])
+
+(defn eul-77
+  ([] (eul-77 10 p))
+  ([n coin]
+   (cond
+     (= n 0) 1
+     (< n 2) 0
+     (empty? coin) 0
+     :else (+ (eul-77 (- n (first coin)) coin)
+              (eul-77 n (rest coin))))))
+
+(def e77 (memoize eul-77))
+
+
+(defn find-sum
+  [n]
+  (let [p (m/primes-to n)
+        r  (fn r [target ps]
+            (cond
+              (= 0 target) 1
+              (= 2 target) 1
+              (< target 2) 0
+              (empty? ps) 0
+              :else (let [i (- n (first ps))]
+                      (+ (r i (remove #(<= i %) ps))
+                         (r n (remove #(<= i %) (rest ps)))))))
+        z (memoize r)]
+    (z n p)))
+
 ;;problem 71
 
 (defn eul-71-1
@@ -13,6 +66,16 @@
 (defn eul-71-2
   [lim]
   ())
+
+(defn eul-72-1
+  [lim]
+  (->> (for [d (range 1 (inc lim))
+             n (range 1 d)
+             :let [nd (/ n d)]]
+         nd)
+       (distinct)
+       (count)))
+
 (defn eul-73-1
   []
   (time (->> (for [d (range 1 (inc 12000))
