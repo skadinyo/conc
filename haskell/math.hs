@@ -1,4 +1,6 @@
 module Math where
+import Data.List
+import Clojure
 
 sq x = x * x
 
@@ -48,13 +50,26 @@ primeFactors x = iter 2 x
       | otherwise = iter (nextPrime p) temp
       where
         d = divUntil temp p
+
+chainPrimeFactor x = iter x 2 []
+  where
+    iter 1 _ res = res
+    iter i p res
+      | 0 == rem i p = iter (div i p) p (p:res)
+      | otherwise = iter i (nextPrime p) res
+
+countFactor 1 = 1
+countFactor x = reduce (*) (map succ (map length (group (chainPrimeFactor x))))
+
 nthPrime nt = iter 1 2
   where
     iter n p
       | n == nt = p
       | otherwise = iter (succ n) (nextPrime p)
 
-dumbPrimeSieve n = iter (2:[3,5..n])
+pascalTriangle = iter []
   where
-    iter [] = []
-    iter (x:xs) = x : iter (filter (\i -> 0 /= rem i x) xs)
+    iter [] = [1] : iter [1]
+    iter x = n : iter n
+      where
+        n = map2 (+) (x++[0]) ([0]++x)

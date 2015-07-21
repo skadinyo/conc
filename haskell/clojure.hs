@@ -11,3 +11,7 @@ reductions f (x:y:xs) = n : reductions f (n:xs)
     n = f x y
 
 reductionsI f ini xs = reductions f (ini:xs)
+
+map2 f _ [] = []
+map2 f [] _ = []
+map2 f (x:xs) (y:ys) = (f x y) : map2 f xs ys
