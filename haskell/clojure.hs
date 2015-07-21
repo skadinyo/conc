@@ -15,3 +15,11 @@ reductionsI f ini xs = reductions f (ini:xs)
 map2 f _ [] = []
 map2 f [] _ = []
 map2 f (x:xs) (y:ys) = (f x y) : map2 f xs ys
+
+maxBy f [] = error "max of empty ?"
+maxBy f (x:[]) = x
+maxBy f (x:xs)
+  | f x > f n = x
+  | otherwise = n
+  where
+     n = (maxBy f xs)

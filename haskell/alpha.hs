@@ -31,3 +31,10 @@ eul10 lim = iter 2
     iter p
       | p > lim = 0
       | otherwise = p + iter (nextPrime p)
+
+countCollatz x
+  | x == 1 = 1
+  | even x = succ (countCollatz (div x 2))
+  | otherwise = succ (countCollatz (succ (3 * x)))
+
+eul14 lim = maxBy last (map (\x -> [x,(countCollatz x)]) [1..(pred lim)])
