@@ -27,6 +27,16 @@ nextPrime x = iter (if (even x) then (x + 1) else (x + 2))
       | isPrime i = i
       | otherwise = iter (i + 2)
 
+genPrime = iter 2
+  where
+    iter x = x : (iter (nextPrime x))
+
+genPrimeBetween a b = iter (if isPrime a then a else nextPrime a)
+  where
+    iter x
+      | x > b = []
+      | otherwise = x : iter (nextPrime x)
+
 divUntil n x
   | 0 == rem n x = divUntil (div n x) x
   | otherwise = n
@@ -117,3 +127,15 @@ countNumber n
 triangleNumber = iter 0 1
   where
     iter a n = a : (iter (a + n) (succ n))
+
+isPermutes a b = sort (numberDigits a) == sort (numberDigits b)
+
+getPermutesOf i xs = iter xs
+  where
+    iref = sort (numberDigits i)
+    iter [] = []
+    iter (y:ys)
+      | yref == iref = y : (iter ys)
+      | otherwise = iter ys
+      where
+        yref = sort (numberDigits y)
