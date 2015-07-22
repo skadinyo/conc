@@ -47,11 +47,36 @@ isPalin x = p == reverse p
   where
     p = numberDigits x
 
+divisors x = iter 1 []
+  where
+    limit = floor $ sqrt (fromIntegral x)
+    iter i res
+      | i > limit = []
+      | 0 == (rem x i) = if i == limit then i : [] else i : (div x i) : (iter (succ i) res)
+      | otherwise = iter (succ i) res
+
+properDivisors x = iter 2 []
+  where
+    limit = floor $ sqrt (fromIntegral x)
+    iter i res
+      | i > limit = [1]
+      | 0 == (rem x i) = if i == limit then i : [1] else i : (div x i) : (iter (succ i) res)
+      | otherwise = iter (succ i) res
+
 primeFactors x = iter 2 x
   where
     iter _ 1 = []
     iter p temp
       | 0 == rem temp p = p : iter (nextPrime p) d
+      | otherwise = iter (nextPrime p) temp
+      where
+        d = divUntil temp p
+
+countPrimeFactors x = iter 2 x
+  where
+    iter _ 1 = 0
+    iter p temp
+      | 0 == rem temp p = 1 + iter (nextPrime p) d
       | otherwise = iter (nextPrime p) temp
       where
         d = divUntil temp p

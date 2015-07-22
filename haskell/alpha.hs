@@ -6,6 +6,13 @@ import Data.List
 
 eul1 lim = sum [x | x <- [1..(pred lim)] , or [(0 == rem x 3),(0 == rem x 5)]]
 
+eul2 lim = iter 1 1
+  where
+    iter a b
+      | a > lim = 0
+      | even a = a + (iter b (b + a))
+      | otherwise = iter b (b + a)
+
 eul3 x = iter 2 x
   where
     iter p temp
@@ -46,9 +53,22 @@ countCollatz x
 
 eul14 lim = maxBy last (map (\x -> [x,(countCollatz x)]) [1..(pred lim)])
 
+eul15 l = pascalTriangle !! (l+l) !! l
+
 eul16 n = sumDigits $ pow2 n
 
 eul20 n = sumDigits $ factorial n
+
+eul23 limit = sum $ iter [2..limit] []
+  where
+    iter [] res = res
+    iter (x:xs) res
+      | x == sumdivx = (iter xs res)
+      | x == sumdivy = x : (iter xs res)
+      | otherwise = iter xs res
+        where
+          sumdivx = sum (properDivisors x)
+          sumdivy = sum (properDivisors sumdivx)
 
 eul24 _ [] = []
 eul24 n elements = iter 0 divn
@@ -58,7 +78,7 @@ eul24 n elements = iter 0 divn
     divn = div maxn c
     iter i t
       | n < t = (elements !! i) : (eul24 (n - (t - divn)) (removeElement i elements))
-      | otherwise = iter (succ i) (t + divn) 
+      | otherwise = iter (succ i) (t + divn)
 
 eul25 n = iter 1 1 1
   where
@@ -67,3 +87,11 @@ eul25 n = iter 1 1 1
       | otherwise = iter b (a + b) (succ c)
 
 eul29 lim = length $ nub [ a^b | a <- [2..lim], b <- [2..lim]]
+
+eul31 target coins
+  | target < 0 = 0
+  | target <= 1 = 1
+  | null coins = 0
+  | otherwise = (eul31 (target - (head coins)) coins) + (eul31 target (tail coins))
+
+eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
