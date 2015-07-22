@@ -29,3 +29,11 @@ removeElement n xs = h++t
     s = splitAt n xs
     h = fst s
     t = tail $ snd s
+
+removeOne _ [] = []
+removeOne x (i:is)
+  | x == i = is
+  | otherwise = i : removeOne x is
+
+removeOnes [] is = is
+removeOnes (x:xs) is = removeOnes xs (removeOne x is) 

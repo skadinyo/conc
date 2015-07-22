@@ -95,3 +95,12 @@ eul31 target coins
   | otherwise = (eul31 (target - (head coins)) coins) + (eul31 target (tail coins))
 
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
+
+eul49 = iter (genPrimeBetween 1000 9999)
+  where
+    iter [] = []
+    iter (x:xs)
+      | 4 <= length (x:xperm) = (x:xperm) : iter (removeOnes xperm xs)
+      | otherwise = iter (removeOnes xperm xs)
+      where
+        xperm = getPermutesOf x xs
