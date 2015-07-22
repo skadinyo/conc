@@ -38,3 +38,13 @@ countCollatz x
   | otherwise = succ (countCollatz (succ (3 * x)))
 
 eul14 lim = maxBy last (map (\x -> [x,(countCollatz x)]) [1..(pred lim)])
+
+eul16 n = sumDigits $ pow2 n
+
+eul20 n = sumDigits $ factorial n
+
+eul25 n = iter 1 1 1
+  where
+    iter a b c
+      | (countNumber a) >= n = c
+      | otherwise = iter b (a + b) (succ c)

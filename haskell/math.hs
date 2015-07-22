@@ -1,5 +1,6 @@
 module Math where
 import Data.List
+import Data.Bits
 import Clojure
 
 sq x = x * x
@@ -38,6 +39,10 @@ numberDigitsC x
   | x < 10 = [x]
   | otherwise = concat [numberDigits (div x 10), [(rem x 10)]]
 
+sumDigits x
+  | x < 10 = x
+  | otherwise = (rem x 10) + sumDigits (div x 10)
+
 isPalin x = p == reverse p
   where
     p = numberDigits x
@@ -73,3 +78,12 @@ pascalTriangle = iter []
     iter x = n : iter n
       where
         n = map2 (+) (x++[0]) ([0]++x)
+
+pow2 n = unsafeShiftL 1 n
+
+factorial 1 = 1
+factorial n = n * factorial (pred n)
+
+countNumber n
+  | n < 10 = 1
+  | otherwise = 1 + countNumber (div n 10)
