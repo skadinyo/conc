@@ -63,6 +63,7 @@ chainPrimeFactor x = iter x 2 []
       | 0 == rem i p = iter (div i p) p (p:res)
       | otherwise = iter i (nextPrime p) res
 
+countFactor 0 = 0
 countFactor 1 = 1
 countFactor x = reduce (*) (map succ (map length (group (chainPrimeFactor x))))
 
@@ -87,3 +88,7 @@ factorial n = n * factorial (pred n)
 countNumber n
   | n < 10 = 1
   | otherwise = 1 + countNumber (div n 10)
+
+triangleNumber = iter 0 1
+  where
+    iter a n = a : (iter (a + n) (succ n))

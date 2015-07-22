@@ -23,3 +23,9 @@ maxBy f (x:xs)
   | otherwise = n
   where
      n = (maxBy f xs)
+
+removeElement n xs = h++t
+  where
+    s = splitAt n xs
+    h = fst s
+    t = tail $ snd s
