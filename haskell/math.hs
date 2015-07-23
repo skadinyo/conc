@@ -82,6 +82,11 @@ primeFactors x = iter 2 x
       where
         d = divUntil temp p
 
+totient n = iter n (primeFactors n)
+  where
+    iter x [] = x
+    iter x (i:is) = iter (div (x * (pred i)) i) is
+
 countPrimeFactors x = iter 2 x
   where
     iter _ 1 = 0
@@ -139,3 +144,5 @@ getPermutesOf i xs = iter xs
       | otherwise = iter ys
       where
         yref = sort (numberDigits y)
+
+sumDigitsFactorial x = sum (map factorial (numberDigits x))

@@ -86,6 +86,16 @@ eul25 n = iter 1 1 1
       | (countNumber a) >= n = c
       | otherwise = iter b (a + b) (succ c)
 
+countReciprocal x = iter 1 []
+  where
+    iter i temp
+      | elem (snd dm) temp = length temp
+      | otherwise = iter (10 * (snd dm)) ((snd dm) : temp)
+        where
+          dm = divMod i x
+
+eul26 lim = maxBy countReciprocal [1..lim]
+
 eul29 lim = length $ nub [ a^b | a <- [2..lim], b <- [2..lim]]
 
 eul31 target coins
