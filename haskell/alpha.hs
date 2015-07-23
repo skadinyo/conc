@@ -59,7 +59,7 @@ eul16 n = sumDigits $ pow2 n
 
 eul20 n = sumDigits $ factorial n
 
-eul23 limit = sum $ iter [2..limit] []
+eul21 limit = sum $ iter [2..limit] []
   where
     iter [] res = res
     iter (x:xs) res
@@ -103,6 +103,8 @@ eul31 target coins
   | target <= 1 = 1
   | null coins = 0
   | otherwise = (eul31 (target - (head coins)) coins) + (eul31 target (tail coins))
+
+eul34 lim = sum [ x | x <- [3..lim], x == sum (map factorial (numberDigitsC x))]
 
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
 

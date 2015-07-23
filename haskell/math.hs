@@ -62,16 +62,16 @@ divisors x = iter 1 []
     limit = floor $ sqrt (fromIntegral x)
     iter i res
       | i > limit = []
-      | 0 == (rem x i) = if i == limit then i : [] else i : (div x i) : (iter (succ i) res)
+      | 0 == (rem x i) = if (and [(i == limit),(i*i == x)]) then i : [] else i : (div x i) : (iter (succ i) res)
       | otherwise = iter (succ i) res
 
-properDivisors x = iter 2 []
+properDivisors x = iter 2
   where
     limit = floor $ sqrt (fromIntegral x)
-    iter i res
+    iter i
       | i > limit = [1]
-      | 0 == (rem x i) = if i == limit then i : [1] else i : (div x i) : (iter (succ i) res)
-      | otherwise = iter (succ i) res
+      | 0 == (rem x i) = if (and [(i == limit),(i*i == x)]) then i : [1] else i : (div x i) : (iter (succ i))
+      | otherwise = iter (succ i)
 
 primeFactors x = iter 2 x
   where
@@ -122,6 +122,7 @@ pascalTriangle = iter []
 
 pow2 n = unsafeShiftL 1 n
 
+factorial 0 = 1
 factorial 1 = 1
 factorial n = n * factorial (pred n)
 
@@ -146,3 +147,5 @@ getPermutesOf i xs = iter xs
         yref = sort (numberDigits y)
 
 sumDigitsFactorial x = sum (map factorial (numberDigits x))
+
+isAbundant x = x < sum (properDivisors x)
