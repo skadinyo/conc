@@ -7,6 +7,25 @@
   (doseq [i coll]
     (println i)))
 
+;;problem 95
+
+(defn sieve-factor
+  [lim]
+  (let [factor-array (int-array (repeat (inc lim) 1))]
+    (do
+      (loop [i 2]
+        (if (> i lim)
+          nil
+          (do
+            (loop [j (+ i i)]
+              (if (> j lim)
+                nil
+                (do
+                  (aset factor-array j (+ i (aget factor-array j)))
+                  (recur (+ j i)))))
+            (recur (inc i))))))
+    (vec factor-array)))
+
 ;;problem 32
 
 (def c [200 100 50 20 10 5 2 1])
