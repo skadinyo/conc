@@ -125,13 +125,12 @@ eul36 lim = sum $ filter isPalinBase2  $ filter isPalin [1,3..lim]
 ----------
 
 ----------
-
-nameNumber x = sum $ map (\i -> i - 64) $ map ord x
+nameNumber :: [Char] -> Integer
+nameNumber x = toInteger $ sum $ map (\i -> i - 64) $ map ord x
 
 triangleNumberRefs = take 20 triangleNumber
 
-eul42 = length $ filter (\x -> elem x triangleNumberRefs) $ map nameNumber problem42
-
+eul42 = length $ filter (\c -> elem c triangleNumberRefs) $ map nameNumber problem42
 ----------
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
 
