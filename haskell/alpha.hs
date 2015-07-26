@@ -1,8 +1,10 @@
 module Alpha where
 
+import Problem
 import Math
 import Clojure
 import Data.List
+import Data.Char
 
 eul1 lim = sum [x | x <- [1..(pred lim)] , or [(0 == rem x 3),(0 == rem x 5)]]
 
@@ -122,6 +124,15 @@ eul36 lim = sum $ filter isPalinBase2  $ filter isPalin [1,3..lim]
 
 ----------
 
+----------
+
+nameNumber x = sum $ map (\i -> i - 64) $ map ord x
+
+triangleNumberRefs = take 20 triangleNumber
+
+eul42 = length $ filter (\x -> elem x triangleNumberRefs) $ map nameNumber problem42
+
+----------
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
 
 eul49 = iter (genPrimeBetween 1000 9999)
@@ -134,4 +145,4 @@ eul49 = iter (genPrimeBetween 1000 9999)
         xperm = getPermutesOf x xs
 
 
-eul53 lim = length $ filter (\c -> c > 1000000) $ concat $ take (succ lim) pascalTriangle 
+eul53 lim = length $ filter (\c -> c > 1000000) $ concat $ take (succ lim) pascalTriangle
