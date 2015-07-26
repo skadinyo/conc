@@ -118,7 +118,7 @@ base10to2 x
 isPalinBase2 x = xs == reverse xs
   where xs = base10to2 x
 
-eul36 lim = sum $ filter isPalinBase2  $ filter odd $ filter isPalin [1..lim]
+eul36 lim = sum $ filter isPalinBase2  $ filter isPalin [1,3..lim]
 
 ----------
 
@@ -132,3 +132,6 @@ eul49 = iter (genPrimeBetween 1000 9999)
       | otherwise = iter (removeOnes xperm xs)
       where
         xperm = getPermutesOf x xs
+
+
+eul53 lim = length $ filter (\c -> c > 1000000) $ concat $ take (succ lim) pascalTriangle 
