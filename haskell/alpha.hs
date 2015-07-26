@@ -82,8 +82,9 @@ eul24 n elements = iter 0 divn
 
 eul25 n = iter 1 1 1
   where
+    lim = 10^(pred n)
     iter a b c
-      | (countNumber a) >= n = c
+      | a > lim = c
       | otherwise = iter b (a + b) (succ c)
 
 countReciprocal x = iter 1 []
@@ -105,6 +106,21 @@ eul31 target coins
   | otherwise = (eul31 (target - (head coins)) coins) + (eul31 target (tail coins))
 
 eul34 lim = sum [ x | x <- [3..lim], x == sum (map factorial (numberDigitsC x))]
+
+----------
+
+base10to2 x
+  | x < 2 = [x]
+  | otherwise = (base10to2 (fst dm)) ++ [(snd dm)]
+  where
+    dm = divMod x 2
+
+isPalinBase2 x = xs == reverse xs
+  where xs = base10to2 x
+
+eul36 lim = sum $ filter isPalinBase2  $ filter odd $ filter isPalin [1..lim]
+
+----------
 
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
 
