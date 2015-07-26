@@ -36,4 +36,9 @@ removeOne x (i:is)
   | otherwise = i : removeOne x is
 
 removeOnes [] is = is
-removeOnes (x:xs) is = removeOnes xs (removeOne x is) 
+removeOnes (x:xs) is = removeOnes xs (removeOne x is)
+
+equal (x:[]) = True
+equal (x:xs)
+  | x == (head xs) = equal xs
+  | otherwise = False

@@ -128,10 +128,18 @@ eul36 lim = sum $ filter isPalinBase2  $ filter isPalin [1,3..lim]
 nameNumber :: [Char] -> Integer
 nameNumber x = toInteger $ sum $ map (\i -> i - 64) $ map ord x
 
-triangleNumberRefs = take 20 triangleNumber
+triangleNumberRefs = take 100 triangleNumber
 
 eul42 = length $ filter (\c -> elem c triangleNumberRefs) $ map nameNumber problem42
 ----------
+
+eul47 n = iter 1 0
+  where
+    iter x temp
+      | temp == n = x - n
+      | n == (countPrimeFactors x) = iter (succ x) (succ temp)
+      | otherwise = iter (succ x) 0
+
 eul48 = rem (sum [ rem (a^a) (10^11) | a <- [1..1000]]) (10^10)
 
 eul49 = iter (genPrimeBetween 1000 9999)
@@ -143,5 +151,13 @@ eul49 = iter (genPrimeBetween 1000 9999)
       where
         xperm = getPermutesOf x xs
 
+eul52 = iter 1
+  where
+    iter x
+      | equal $ map sort $ map numberDigits $ map (\c -> c * x) [1,2,3,4,5,6] = x
+      | otherwise = iter (succ x)
+
 
 eul53 lim = length $ filter (\c -> c > 1000000) $ concat $ take (succ lim) pascalTriangle
+
+eul56 lim = maximum [sum $ numberDigits $ a^b | a <- [1..lim], b <- [1..lim]]
