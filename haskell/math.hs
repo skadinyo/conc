@@ -120,6 +120,10 @@ pascalTriangle = iter []
       where
         n = map2 (+) (x++[0]) ([0]++x)
 
+fibo = iter 0 1
+  where
+    iter a b = a : (iter b (a + b))
+
 pow2 n = unsafeShiftL 1 n
 
 factorial 0 = 1
