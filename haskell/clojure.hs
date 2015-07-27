@@ -3,7 +3,7 @@ module Clojure where
 reduce f (x:[]) = x
 reduce f (x:y:xs) = reduce f ((f x y) : xs)
 
-reduceI f ini xs = reduce f (init:xs)
+reduceI f ini xs = reduce f (ini:xs)
 
 reductions f (x:[]) = [x]
 reductions f (x:y:xs) = n : reductions f (n:xs)
