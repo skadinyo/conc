@@ -101,6 +101,12 @@ eul26 lim = maxBy countReciprocal [1..lim]
 
 eul29 lim = length $ nub [ a^b | a <- [2..lim], b <- [2..lim]]
 
+eul30a n = sum [ x | x <- [2..(9^n * (n - 1))], x == sum (map (\c -> c^n) (numberDigits x))]
+
+eul30b n = sum [ x | x <- [2..(9^n * (n - 1))], x == sum (map (\c -> (ref !! c)) (numberDigits x))]
+  where
+    ref = map (\c -> c^n) [0..9]
+
 eul31 target coins
   | target < 0 = 0
   | target <= 1 = 1
