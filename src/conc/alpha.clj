@@ -42,6 +42,20 @@
 
 (def e32 (memoize eul-32))
 
+;;problem 76
+
+(defn eul-76
+  [target coin]
+  (cond
+    (< target 0) 0
+    (<= target 1) 1
+    (empty? coin) 0
+    :else (+' (eul-76 (- target (first coin)) (filter #(<= % target) coin))
+              (eul-76 target (rest coin)))))
+
+(def e76 (memoize eul-76))
+
+
 ;;problem 77
 
 (def p [2 3 5 7])
