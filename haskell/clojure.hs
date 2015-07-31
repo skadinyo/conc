@@ -1,5 +1,9 @@
 module Clojure where
 
+cons x xs = x:xs
+
+abs' x = if x >= 0 then x else (-x)
+
 reduce f (x:[]) = x
 reduce f (x:y:xs) = reduce f ((f x y) : xs)
 
