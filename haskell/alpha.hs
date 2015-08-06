@@ -28,3 +28,9 @@ squareDigit x = squareDigit $ sum $ map (\x -> x * x) $ numberDigits x
 countDigit x
   | x < 10 = 1
   | otherwise = succ $ countDigit $ div x 10
+
+belIsPrime n
+  | n < 2 = False
+  | n == 2 = True
+  | even n = False
+  | otherwise = (any (\a -> ((rem n a) == 0)) [3..(sqrt n)])
