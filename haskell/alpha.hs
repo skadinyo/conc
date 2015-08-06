@@ -33,4 +33,4 @@ belIsPrime n
   | n < 2 = False
   | n == 2 = True
   | even n = False
-  | otherwise = (any (\a -> ((rem n a) == 0)) [3..(sqrt n)])
+  | otherwise = (any (\a -> ((rem n a) == 0)) [3..(floor (sqrt $ fromIntegral n))])
