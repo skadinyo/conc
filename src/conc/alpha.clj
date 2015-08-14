@@ -7,6 +7,77 @@
   (doseq [i coll]
     (println i)))
 
+;;114
+
+(defn eul144
+  [batako kosong]
+  (cond
+    (> batako kosong) 0
+    :else (let [root (+ 1 (- kosong batako))
+                n-r (range batako (inc kosong) (inc batako))]
+            (+ root
+               (reduce + (map #(eul144 % kosong) n-r))
+               (eul144 (inc batako) kosong)))))
+
+;;116
+
+(defn r
+  [n]
+  )
+
+;;121
+
+(defn eul-121
+  [n]
+  (let [tmp (loop [res [1] c 1]
+              (if (> c n)
+                res
+                (recur (let [asd (flatten (map (fn [x]
+                                                 [x (* x c)]) res))
+                             a (first asd)
+                             d (last asd)
+                             s (->> asd
+                                    (butlast)
+                                    (rest)
+                                    (partition 2)
+                                    (map (partial apply +)))]
+                         (vec (concat [a] s [d])))
+                       (inc c))))]
+    (do
+      (println tmp)
+      (->> (split-at (if (even? n)
+                       (quot n 2)
+                       (quot (inc n) 2)) tmp)
+           (map (partial apply +))
+           (reverse)
+           (apply /)
+           (inc)
+           (int)))))
+;;
+
+(def t [0 10 0.0])
+
+(defn next-count
+  [i]
+  (cond
+    (= 20.0 i) [0.0]
+    (= 20 i) [0 0.0]
+    (= 10.0 i) [0.0 20.0]
+    (= 10 i) [0 0.0 20]
+    (= 0.0 i) [0.0 10.0]
+    :else [0 0.0 10]))
+
+(def n-c (memoize next-count))
+
+(defn eul-191
+  [n awal]
+  (loop [i awal c 1]
+    (do
+      (println c)
+      (if (= c n)
+        (count i)
+        (recur (flatten (map n-c i))
+               (inc c))))))
 ;;problem 95
 
 (defn sieve-factor
@@ -76,7 +147,7 @@
 (defn find-sum
   [n]
   (let [p (m/primes-to n)
-        r  (fn r [target ps]
+        r (fn r [target ps]
             (cond
               (= 0 target) 1
               (= 2 target) 1
@@ -162,7 +233,7 @@
 
 (defn odd-totient-to
   [lim]
-  (let [p (m/primes-tox lim)
+  (let [p (m/primes-to lim)
         tot (long-array (range 0 lim))]
     (do
       (doseq [ip p]
@@ -178,8 +249,8 @@
 (defn eul-187-1
   [lim]
   (let [res (atom 0)
-        ps (m/primes-tox (/ lim 2))
-        p (m/primes-tox (Math/sqrt lim))]
+        ps (m/primes-to (/ lim 2))
+        p (m/primes-to (Math/sqrt lim))]
     (do (doseq [i p]
           (doseq [j (take-while #(> lim (* i %)) (drop-while #(< % i) ps))]
             (swap! res inc)))
@@ -187,7 +258,7 @@
 
 (defn eul-187-2
   [lim]
-  (let [ps (m/primes-tox (/ lim 2))
+  (let [ps (m/primes-to (/ lim 2))
         l (Math/sqrt lim)
         p (take-while #(< % l) ps)]
     (loop [[i & is] p res 0]
@@ -198,7 +269,7 @@
 
 (defn eul-187-3
   [lim]
-  (let [ps (m/primes-tox (/ lim 2))
+  (let [ps (m/primes-to (/ lim 2))
         l (Math/sqrt lim)
         p (take-while #(< % l) ps)]
     (apply + (pmap #(count (->> ps
