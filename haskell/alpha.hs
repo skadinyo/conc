@@ -16,19 +16,3 @@ eul76 target coins
   | target <= 1 = 1
   | null coins = 0
   | otherwise = (eul76 (target - (head coins)) coins) + (eul76 target (tail coins))
-
-
-squareList = scanl1 (*) [1..]
-square i = squareList !! i
-
-squareDigit 1 = False
-squareDigit 89 = True
-squareDigit x = squareDigit $ sum $ map (\x -> x * x) $ numberDigits x
-
-countDigit x
-  | x < 10 = 1
-  | otherwise = succ $ countDigit $ div x 10
-
-powerOf = (!!) [(zipWith (^) (repeat x) [1..])| x <- [0..]]
-
-nNumber = (!!) [(scanl1 (+) [1,i..]) | i <- [0..]]
