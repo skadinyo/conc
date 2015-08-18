@@ -19,12 +19,6 @@
                (reduce + (map #(eul144 % kosong) n-r))
                (eul144 (inc batako) kosong)))))
 
-;;116
-
-(defn r
-  [n]
-  )
-
 ;;121
 
 (defn eul-121
