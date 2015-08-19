@@ -7,6 +7,34 @@
   (doseq [i coll]
     (println i)))
 
+
+;;problem 85
+(def trinum (reductions + (range)))
+
+(defn e85
+  [x y]
+  (apply * (map (partial nth trinum) [x y])))
+
+(defn eul85
+  [lim]
+  (let [refs (to-array-2d (vec (repeat lim (repeat lim 1))))]
+    (do
+      (doseq [i (range 0 lim)]
+        (let [ni (nth trinum i)]
+          (doseq [j (range 0 lim)]
+            (aset refs i j ni))))
+      (doseq [j (range 0 lim)]
+        (let [nj (nth trinum j)]
+          (doseq [i (range 0 lim)]
+            (aset refs i j (* (aget refs i j) nj)))))
+      (->> (for [i (range 0 lim)
+                 j (range 0 lim)]
+             [(* i j) [i j] (aget refs i j)])
+           (sort-by last)
+           (take-while #(> 2000000 (last %)))
+           (reverse)
+           (first)))))
+
 ;;114
 
 (defn eul144
