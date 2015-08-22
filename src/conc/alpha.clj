@@ -7,6 +7,36 @@
   (doseq [i coll]
     (println i)))
 
+;;problem 108
+
+(defn prime-sieve-
+  [lim]
+  (let [refs (boolean-array lim true)]
+    (do
+      (doseq [n (range 2 lim)
+              :when (aget refs n)]
+        (doseq [i (range (+ n n) lim n)]
+          (aset refs i false)))
+      (vec lim))))
+
+(defn sieve-factor-
+  [lim]
+  (let [refs (into-array (repeat lim 1))]
+    (do
+      (doseq [n (range 2 lim)]
+        (doseq [i (range n lim n)]
+          (aset refs i (inc (aget refs i)))))
+      refs)))
+
+(defn eul108
+  [lim]
+  (let [facs (sieve-factor- lim)
+        get-i (fn [i]
+                (aget facs (* i i)))]
+    (loop [i 2]
+      (if (> (get-i i) 1000)
+        i
+        (recur (inc i))))))
 
 ;;problem 85
 (def trinum (reductions + (range)))
