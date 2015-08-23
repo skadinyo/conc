@@ -9,15 +9,45 @@
 
 ;;problem 108
 
+(defn div-until-n
+  [n pembagi]
+  (loop [i n res 0]
+    (if (= 0 (rem i pembagi))
+      (recur (quot i pembagi)
+             (inc res))
+      [i res])))
+
 (defn prime-sieve-
-  [lim]
-  (let [refs (boolean-array lim true)]
+  [nlim]
+  (let [lim (inc nlim)
+        par (int (Math/sqrt lim))
+        refs (boolean-array lim true)]
     (do
       (doseq [n (range 2 lim)
-              :when (aget refs n)]
+              :when (aget refs n)
+              :while (< n par)]
         (doseq [i (range (+ n n) lim n)]
           (aset refs i false)))
-      (vec lim))))
+      (for [i (range 2 lim)
+            :when (aget refs i)]
+        i))))
+
+(defn seret-faktor
+  [nlim]
+  (let [lim (inc nlim)
+        primes (m/primes-to lim)
+        prime-faktor (into-array (vec (repeat lim [])))]
+    (do
+      (doseq [n primes]
+        (loop [i n]
+          (if (< i lim)
+            (do
+              (aset prime-faktor i (conj (aget prime-faktor i)
+                                         n))
+              (recur (+ i n)))
+            nil)))
+      (for [i (range 0 lim)]
+        (aget prime-faktor i)))))
 
 (defn sieve-factor-
   [lim]
