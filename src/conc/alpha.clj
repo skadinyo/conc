@@ -9,6 +9,10 @@
 
 ;;problem 108
 
+(defn ketok-ketok
+  [lim]
+  (loop [i [1]]))
+
 (defn div-until-n
   [n pembagi]
   (loop [i n res 0]
