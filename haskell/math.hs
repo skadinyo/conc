@@ -9,6 +9,7 @@ isPrime 0 = False
 isPrime 1 = False
 isPrime 2 = True
 isPrime 3 = True
+isPrime 4 = False
 isPrime x
   | 0 == rem x 2 = False
   | 0 == rem x 3 = False
