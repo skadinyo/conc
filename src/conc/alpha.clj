@@ -7,6 +7,43 @@
   (doseq [i coll]
     (println i)))
 
+;;Problem 205
+
+(defn +-*
+  [[k1 v1] [k2 v2]]
+  {(+ k1 k2) (* v1 v2)})
+
+(defn --*
+  [[k1 v1] [k2 v2]]
+  {(- k1 k2) (* v1 v2)})
+
+(defn combiner
+  [r d]
+  (apply merge-with + (map #(+-* r %) (vec d))))
+
+(defn combiner-
+  [r d]
+  (apply merge-with + (map #(--* r %) (vec d))))
+
+(defn combine
+  [rs ds]
+  (apply merge-with + (map combiner rs (repeat ds))))
+
+(defn combine-
+  [rs ds]
+  (apply merge-with + (map combiner- rs (repeat ds))))
+
+(defn calculate-prob
+  [n-dice faces]
+  (reduce combine (repeat n-dice (zipmap (range 1 (inc faces))
+                                         (repeat (/ 1 faces))))))
+
+(defn eul-205
+  []
+  (let [peter (calculate-prob 9 4)
+        collin (calculate-prob 6 6)]
+    (combine- collin peter)))
+
 ;;problem 108
 
 (defn ketok-ketok
