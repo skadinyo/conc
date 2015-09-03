@@ -42,7 +42,7 @@
   []
   (let [peter (calculate-prob 9 4)
         collin (calculate-prob 6 6)]
-    (combine- collin peter)))
+    (combine- peter collin)))
 
 ;;problem 108
 
