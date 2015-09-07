@@ -1,11 +1,71 @@
 (ns conc.alpha
   (require [clojure.core.reducers :as r]
-           [conc.core :as m]))
+           [conc.core :as m]
+           [clojure.java.io :as io]))
 
 (defn print-print
   [coll]
   (doseq [i coll]
     (println i)))
+
+
+;;
+
+(defn dudu
+  [st]
+  (->> (seq st)
+       (partition-by identity)
+       (map (fn [coll]
+              (str (first coll) (let [c (count coll)]
+                                  (if (> c 1)
+                                    c
+                                    nil)))))
+       (apply str)))
+
+;;Problem 108
+
+(defn pow
+  "a^b"
+  [a b]
+  (reduce *' (repeat b a)))
+
+
+(def primess [2 3 5 7 11 13 17 19])
+
+(def count-me (fn [coll]
+                (/ (->> coll
+                        (map (partial * 2))
+                        (map inc)
+                        (reduce *))
+                   2)))
+(def calculate-me (fn [coll]
+                    (->> coll
+                         (map pow primess)
+                         (reduce *'))))
+(defn find-p-facs
+  [n]
+  (map #(m/count-div % n) primess))
+
+(defn momo [x]
+  (let [r (range 0 (inc x))]
+    (for [a r
+          b r
+          c r
+          d r
+          e r
+          f r
+          :let [coll [a b c d e f]
+                con (count-me coll)
+                don (calculate-me coll)]
+          :when (and
+                  (>= a b)
+                  (>= b c)
+                  (>= c d)
+                  (>= d e)
+                  (>= e f)
+                  (>= con 1000))]
+      [don
+       con])))
 
 ;;Problem 205
 

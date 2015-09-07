@@ -20,6 +20,19 @@
             false
             (recur (+' i 2))))))))
 
+(defn pfactors
+  [nt]
+  (let [lim (Math/sqrt nt)]
+    (loop [p 2 n nt res []]
+      (let [d (quot n p) r (rem n p)]
+        (if (> p lim)
+          (sort (distinct (conj res p d)))
+          (if (zero? r)
+            (if (or (= 1 d) (prime? d))
+              (sort (distinct (conj res p d)))
+              (recur 2 d (conj res p)))
+            (recur (next-prime p) n res)))))))
+
 (defn next-prime
   [n]
   (let [i (if (even? n)
@@ -160,12 +173,13 @@
 (defn count-div
   [a b]
   (loop [temp b res 0]
-    (if (not (= 0 (rem temp a)))
-      res
-      (recur (quot temp a) (inc res)))))
+    (if (= 0 (rem temp a))
+      (recur (quot temp a) (inc res))
+      res)))
 
 (defn psquare?
   [n]
   (let [sn (Math/sqrt n)]
     (== sn (int sn))))
+
 
