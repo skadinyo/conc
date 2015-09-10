@@ -2,6 +2,26 @@ module Temp where
 
 import Data.List
 
+foldl1'' f i [] = i
+foldl1'' f i (x:xs) = foldl1'' f (f i x) xs
+
+union'' x y = nub (x ++ y)
+
+scanl'' f i [] = []
+scanl'' f i (x:xs) = temp : (scanl'' f temp xs)
+  where temp = (f i x)
+
+scanl1'' f [] = []
+scanl1'' f [x] = [x]
+scanl1'' f (x:xs) = temp : (scanl1'' f (temp:(tail xs)))
+  where
+     temp = (f x (head xs))
+
+sort' [] = []
+sort' (x:xs) = [zazan (x:xs)] ++ sort' (delete' (zazan (x:xs)) (x:xs))
+  where zazan [z] = z
+        zazan (x:xs) = min (x) (zazan xs)
+
 -- 1.a
 
 null' [] = True
