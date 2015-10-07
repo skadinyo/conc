@@ -19,3 +19,8 @@
      (cons init (lazy-seq (reductions- f (f init x) xs)))
      [init])))
 
+(defn num-dig
+  [x b]
+  (if (< x b)
+    [x]
+    (cons (rem x b) (num-dig (quot x b) b))))

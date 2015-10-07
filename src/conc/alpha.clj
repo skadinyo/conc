@@ -1,5 +1,7 @@
 (ns conc.alpha
   (require [clojure.core.reducers :as r]
+           [clojure.set :as s]
+           [clojure.string :as cs]
            [conc.core :as m]
            [clojure.java.io :as io]))
 
@@ -8,6 +10,289 @@
   (doseq [i coll]
     (println i)))
 
+;;Problem 98
+
+(defn eul-98-p
+  []
+  (->> (-> (slurp "./resources/p98.txt")
+           (cs/split #","))
+       (map (fn [s]
+              (->> s butlast rest (apply str))))))
+
+(defn palin-string?
+  [a]
+  (let [x (seq a)]
+    (= x (reverse x))))
+
+(defn find-anagram-string
+  []
+  (let [all (->> (eul-98-p) (remove palin-string?))]
+    (->> all
+         (group-by (fn [s]
+                     (-> s sort)))
+         (vals)
+         (filter #(= 2 (count %))))))
+
+
+(defn find-anagram-square
+  []
+  (let [squares (->> (range)
+                     (rest)
+                     (map #(* % %))
+                     (take-while #(> 1000000000 %)))]
+    (->> squares
+         (group-by (fn [s]
+                     (-> s m/number-coll sort)))
+         (vals)
+         (filter #(< 1 (count %)))
+         (group-by (fn [coll]
+                     (-> coll first m/count-number))))))
+
+(defn ana-sq
+  [[s1 s2] [n1 n2]]
+  (let [m1 (set (map vector s1 (m/number-coll n1)))
+        m2 (set (map vector s2 (m/number-coll n2)))
+        p1 (->> (vec m1) (group-by last) vals)
+        p2 (->> (vec m2) (group-by last) vals)
+        p3 (->> (vec m1) (group-by first) vals)
+        p4 (->> (vec m2) (group-by first) vals)]
+    (and (= m1 m2)
+         (->> p1
+              (map count)
+              (apply = 1))
+         (->> p2
+              (map count)
+              (apply = 1))
+         (->> p3
+              (map count)
+              (apply = 1))
+         (->> p4
+              (map count)
+              (apply = 1)))))
+
+(defn ana-sqs
+  [ss coll]
+  (let [all (->> (set coll)
+                 (m/n-permutes 2)
+                 (map vec))]
+    (->> all
+         (filter (fn [a]
+                   (ana-sq ss a))))))
+
+(defn eul-98
+  []
+  (let [sts (find-anagram-string)
+        sqs (find-anagram-square)]
+    (loop [[i & is] sts temp {}]
+      (if i
+        (let [c (count (first i))
+              all (get sqs c)]
+          (recur is (let [pair (->> all
+                                    (map (partial ana-sqs i))
+                                    (remove empty?)
+                                    (apply concat))]
+                      (assoc temp i pair))))
+        (->> temp
+             (vals)
+             (flatten)
+             (apply max))))))
+
+;;Problem 93
+
+(defn bagi
+  [a b]
+  (if (= 0 b)
+    0
+    (/ a b)))
+
+(defn calcu-me
+  [a b]
+  (concat (map (fn [f]
+                 (f a b))
+               [+ - * bagi])
+          (map (fn [f]
+                 (f b a))
+               [+ - * bagi])))
+
+(defn find-consecutive
+  [coll]
+  (loop [c 1 [x & xs] coll]
+    (if (= c x)
+      (recur (inc c) xs)
+      (dec c))))
+
+(defn abcd
+  [coll]
+  (->> (map < (butlast coll) (rest coll))
+       (apply = true)))
+
+(defn arithmatic
+  [coll]
+  (let [find (fn [[x & xs]]
+               (loop [[i & is] xs temp [x]]
+                 (if i
+                   (recur is
+                          (->> temp
+                               (map (partial calcu-me i))
+                               (apply concat)
+                               (distinct)))
+                   temp)))]
+    (->> (m/n-permutes (count coll) coll)
+         (map find)
+         (apply concat)
+         (filter (fn [x]
+                   (and
+                     (integer? x)
+                     (< 0 x))))
+         (distinct)
+         (sort)
+         (find-consecutive))))
+
+(defn eul-93
+  []
+  (let [x (m/n-permutes 4 [1 2 3 4])]
+    (->> (map arithmatic x)
+         (apply max))))
+
+;;Problem 75
+
+(defn phytagorean-triples
+  [lim]
+  (let [call-triplet (fn [n m]
+                       (let [m2 (* m m)
+                             n2 (* n n)]
+                         [(- m2 n2) (* 2 m n) (+ m2 n2)]))
+        triplets (for [n (range 1 lim)
+                       m (range 1 lim)
+                       :when (and
+                               (> m n)
+                               (odd? (- m n))
+                               (= 1 (m/gcd m n)))
+                       :let [triple (call-triplet n m)]
+                       :while (>= 1500000 (apply + triple))]
+                   (loop [i 2 res [triple]]
+                     (let [kali (map (partial * i) triple)
+                           hasil (apply + kali)]
+                       (if (>= hasil 1500000)
+                         res
+                         (recur (inc i) (conj res kali))))))]
+    (->> triplets
+         (apply concat)
+         (map (partial reduce +))
+         (sort)
+         (partition-by identity)
+         (map count)
+         (filter #{1})
+         (reduce +))))
+
+;;Problem 60
+
+(defn get-head
+  [x]
+  (if (< x 10)
+    x
+    (get-head (quot x 10))))
+
+(defn get-head-tails
+  [x]
+  ((juxt get-head #(rem % 10)) x))
+
+(defn concat-number
+  [a b]
+  (if (> a b)
+    (+ a b)
+    (concat-number (* a 10) b)))
+
+(defn all-primes-concat?
+  [all coll]
+  (->> coll
+       (m/n-permutes 2)
+       (map (partial apply concat-number))
+       (every? m/prime?)))
+
+(defn remove-them
+  [coll all]
+  (s/difference coll all))
+
+(defn find-pair
+  [coll all]
+  (for [x all
+        :let [temp (conj coll x)]
+        :when (all-primes-concat? temp)]
+    temp))
+
+(defn eul-60-test
+  []
+  (let [primes (m/primes-to 100000)
+        probably [3 7 109 673]]
+    probably))
+
+;;Problem 61
+
+(defn num-n
+  [n]
+  (->> (range 1 10000 (- n 2))
+       (reductions +)
+       (take-while (partial > 10000))
+       (drop-while (partial > 999))
+       (map (juxt (constantly n) #(quot % 100) #(rem % 100)))
+       (filter (fn [[_ _ t]] (> t 10)))))
+
+(defn have-relation?
+  [[i1 _ t1] [i2 h2 _]]
+  (and (not= i1 i2)
+       (= t1 h2)))
+
+(defn find-rel
+  [chain poly]
+  (let [heads (->> chain
+                   (map first)
+                   (set))
+        l (-> chain last last)]
+    (->> (filter (fn [[i h _]]
+                   (and (= l h)
+                        (not (heads i)))) poly)
+         (map (partial conj chain)))))
+
+(defn eul-61
+  []
+  (let [ps (->> (range 3 9)
+                (map num-n)
+                (apply concat))
+        p (map vector ps)]
+    (loop [c 1 temp p]
+      (if (= c 6)
+        (->> temp
+             (filter (fn [all]
+                       (let [f (first all)
+                             l (last all)]
+                         (have-relation? l f))))
+             (map set)
+             (set)
+             (first)
+             (into [])
+             (map rest)
+             (map (fn [[k v]]
+                    (+ (* 100 k)
+                       v)))
+             (apply +))
+        (let [nex (->> temp
+                       (map #(find-rel % ps))
+                       (apply concat)
+                       (filter #(= (inc c) (count %))))]
+          (recur (inc c) nex))))))
+
+(defn find-relation
+  []
+  (let [poly (->> (range 3 9)
+                  (map num-n)
+                  (apply concat)
+                  (reverse))]
+    (loop [[x & xs] poly]
+      (loop [c 1 temp (->> xs
+                           (filter-poly x)
+                           (into {}))]
+        ))))
 
 ;;
 

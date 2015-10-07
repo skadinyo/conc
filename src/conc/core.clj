@@ -1,6 +1,18 @@
 (ns conc.core
   (require [clojure.core.reducers :as r]))
 
+(defn gcd
+  [a b]
+  (if (zero? b)
+    a
+    (recur b (mod a b))))
+
+(defn count-number
+  [x]
+  (if (< x 10)
+    1
+    (+ 1 (count-number (quot x 10)))))
+
 (defn prime?
   [x]
   (cond
@@ -33,15 +45,7 @@
               (recur 2 d (conj res p)))
             (recur (next-prime p) n res)))))))
 
-(defn next-prime
-  [n]
-  (let [i (if (even? n)
-            (+ 1 n)
-            (+ 2 n))]
-    (loop [j i]
-      (if (prime? j)
-        j
-        (recur (+ 2 j))))))
+
 
 
 (defn primes-to
